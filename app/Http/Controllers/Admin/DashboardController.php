@@ -14,10 +14,11 @@ class DashboardController extends Controller
         $totalUsers = User::count();
         $activeSchools = School::where('subscription_status', 'active')->count();
         $trialSchools = School::where('subscription_status', 'trial')->count();
-        $recentSchools = School::with('owner')->latest()->take(5)->get();
+        $recentSchools = School::with('owner')->withCount('users')->latest()->take(5)->get();
+        $recentUsers = User::with('school')->latest()->take(8)->get();
 
         return view('admin.dashboard', compact(
-            'totalSchools', 'totalUsers', 'activeSchools', 'trialSchools', 'recentSchools'
+            'totalSchools', 'totalUsers', 'activeSchools', 'trialSchools', 'recentSchools', 'recentUsers'
         ));
     }
 }

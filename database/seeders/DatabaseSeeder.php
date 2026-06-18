@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -19,11 +20,19 @@ class DatabaseSeeder extends Seeder
             PlanSeeder::class,
         ]);
 
-        // User::factory(10)->create();
+        // Super Admin — can access the platform admin panel at /admin
+        User::create([
+            'first_name' => 'Super',
+            'last_name'  => 'Admin',
+            'email'      => 'admin@easysolve.com',
+            'password'   => Hash::make('password'),
+            'role'       => 'super_admin',
+        ]);
 
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'first_name' => 'Test',
+            'last_name'  => 'User',
+            'email'      => 'test@example.com',
         ]);
     }
 }

@@ -34,14 +34,14 @@ class LoginController extends Controller
         $user = Auth::user();
 
         if ($user->isSuperAdmin()) {
-            return redirect()->intended(route('admin.dashboard'));
+            return redirect()->route('admin.dashboard');
         }
 
         if ($user->school_id) {
-            return redirect()->intended(route('school.dashboard'));
+            return redirect()->route('school.dashboard');
         }
 
-        return redirect()->intended(route('dashboard'));
+        return redirect()->route('dashboard');
     }
 
     public function destroy(Request $request)
