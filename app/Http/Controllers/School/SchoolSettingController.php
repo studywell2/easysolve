@@ -1,0 +1,54 @@
+<?php
+
+namespace App\Http\Controllers\School;
+
+use App\Http\Controllers\Controller;
+use App\Models\School;
+use Illuminate\Http\Request;
+
+class SchoolSettingController extends Controller
+{
+    public function index()
+    {
+        $school = auth()->user()->school;
+
+        return view('school.settings.index', compact('school'));
+    }
+
+    public function update(Request $request)
+    {
+        $school = auth()->user()->school;
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:500',
+            'short_name' => 'nullable|string|max:20',
+            'motto' => 'nullable|string|max:255',
+        ]);
+
+        $school->update($validated);
+
+        return back()->with('success', 'School settings updated successfully.');
+    }
+
+    public function updateTerms(Request $request)
+    {
+        $school = auth()->user()->school;
+
+        $validated = $request->validate([
+            'terms_and_conditions' => 'nullable|string',
+        ]);
+
+        $school->update([
+            'terms_and_conditions' => $validated['terms_and_conditions'],
+            'terms_updated_at' => !empty($validated['terms_and_conditions']) ? now() : null,
+        ]);
+
+        // Auto-accept for the owner who updated the terms
+        $request->user()->update(['terms_accepted_at' => now()]);
+
+        return back()->with('success', 'Terms & Conditions updated successfully.');
+    }
+}
