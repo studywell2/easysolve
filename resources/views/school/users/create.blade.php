@@ -102,16 +102,14 @@
 
                 <div class="border-t border-gray-100"></div>
 
-                <!-- Password -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label for="password" class="block text-sm font-semibold text-slate-700 mb-1.5">Password <span class="text-red-400">*</span></label>
-                        <input type="password" id="password" name="password" class="w-full px-4 py-2.5 bg-gray-50/80 border {{ $errors->has('password') ? 'border-red-300' : 'border-gray-200' }} rounded-xl text-sm focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/10 transition">
-                        @error('password') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label for="password_confirmation" class="block text-sm font-semibold text-slate-700 mb-1.5">Confirm Password</label>
-                        <input type="password" id="password_confirmation" name="password_confirmation" class="w-full px-4 py-2.5 bg-gray-50/80 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/10 transition">
+                <!-- Auto-generated Password Notice -->
+                <div class="p-4 rounded-xl bg-brand-50 border border-brand-100">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-brand-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 0h10.5a2.25 2.25 0 012.25 2.25v6.75a2.25 2.25 0 01-2.25 2.25H6.75a2.25 2.25 0 01-2.25-2.25v-6.75a2.25 2.25 0 012.25-2.25z"/></svg>
+                        <div>
+                            <p class="text-sm font-semibold text-brand-700">A secure temporary password will be auto-generated</p>
+                            <p class="text-xs text-brand-600 mt-0.5">The user will receive their password via email. They will be prompted to change it on first login.</p>
+                        </div>
                     </div>
                 </div>
 

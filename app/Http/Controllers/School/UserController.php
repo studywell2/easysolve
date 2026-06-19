@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
@@ -61,7 +62,6 @@ class UserController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
             'role' => 'required|in:admin,teacher,student,parent',
             'class_id' => ['nullable', Rule::exists('classes', 'id')->where('school_id', $schoolId)],
             'section_id' => 'nullable|exists:sections,id',
@@ -80,7 +80,10 @@ class UserController extends Controller
         }
 
         $validated['school_id'] = $schoolId;
-        $validated['password'] = Hash::make($validated['password']);
+
+        // Generate a secure random temporary password
+        $tempPassword = Str::random(12);
+        $validated['password'] = Hash::make($tempPassword);
 
         $subjects = $validated['subjects'] ?? [];
         unset($validated['subjects']);
@@ -89,7 +92,7 @@ class UserController extends Controller
         $user->subjects()->sync($subjects);
 
         // Send welcome email
-        Mail::to($user->email)->queue(new UserWelcomeMail($user, $request->password));
+        Mail::to($user->email)->queue(new UserWelcomeMail($user, $tempPassword));
 
         return redirect()->route('school.users.index')->with('success', 'User created successfully.');
     }
@@ -143,7 +146,7 @@ class UserController extends Controller
         }
 
         if ($request->filled('password')) {
-            $request->validate(['password' => 'string|min:6|confirmed']);
+            $request->validate(['password' => 'string|min:8|confirmed']);
             $validated['password'] = Hash::make($request->password);
         }
 
@@ -270,22 +273,27 @@ class UserController extends Controller
                     $parentId = $parents[$parentEmail] ?? null;
                     if (!$parentId && $role === 'student') {
                         // Create parent if doesn't exist
+                        $parentPassword = Str::random(12);
                         $parent = User::create([
                             'school_id' => $schoolId,
                             'first_name' => 'Parent',
                             'last_name' => $data['last_name'],
                             'email' => $parentEmail,
-                            'password' => Hash::make('password'),
+                            'password' => Hash::make($parentPassword),
                             'role' => 'parent',
                             'is_active' => true,
                         ]);
                         $parentId = $parent->id;
                         $parents[$parentEmail] = $parentId;
+
+                        Mail::to($parentEmail)->queue(new UserWelcomeMail($parent, $parentPassword));
                         $created++;
                     }
                 }
 
-                User::create([
+                // Generate a secure random temporary password for each imported user
+                $userPassword = Str::random(12);
+                $newUser = User::create([
                     'school_id' => $schoolId,
                     'parent_id' => $parentId,
                     'class_id' => $classId,
@@ -293,16 +301,13 @@ class UserController extends Controller
                     'first_name' => trim($data['first_name']),
                     'last_name' => trim($data['last_name']),
                     'email' => $email,
-                    'password' => Hash::make('password'),
+                    'password' => Hash::make($userPassword),
                     'role' => $role,
                     'is_active' => true,
                 ]);
 
-                // Queue welcome email
-                Mail::to($email)->queue(new UserWelcomeMail(
-                    User::where('email', $email)->first(),
-                    'password'
-                ));
+                // Queue welcome email with the generated password
+                Mail::to($email)->queue(new UserWelcomeMail($newUser, $userPassword));
 
                 $created++;
             }

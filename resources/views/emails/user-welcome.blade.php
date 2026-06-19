@@ -11,7 +11,7 @@ Here are your login details:
 |-------|-------|
 | **Login URL** | {{ config('app.url') . '/login' }} |
 | **Email** | {{ $user->email }} |
-| **Password** | {{ $password }} |
+| **Temporary Password** | {{ $password }} |
 | **Role** | {{ ucfirst($user->role) }} |
 
 @if($user->class_id)
@@ -22,7 +22,7 @@ Here are your login details:
 Login Now
 @endcomponent
 
-**Important:** Please change your password after your first login for security.
+⚠️ **Security Notice:** This is a temporary password. Please change it immediately after your first login. Never share this password with anyone.
 
 ---
 

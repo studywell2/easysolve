@@ -28,7 +28,7 @@ class RegisterController extends Controller
             'owner_first_name' => 'required',
             'owner_last_name' => 'required',
             'owner_email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6|confirmed',
+            'password' => 'required|min:8|confirmed',
         ]);
 
         DB::transaction(function () use ($data, &$school, &$user) {

@@ -98,7 +98,7 @@
                 <div class="border-t border-gray-100"></div>
 
                 <div>
-                    <p class="text-sm text-slate-500 mb-3">Leave password fields blank to keep current password</p>
+                    <p class="text-sm text-slate-500 mb-3">Leave password fields blank to keep current password (min 8 characters if setting new)</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label for="password" class="block text-sm font-semibold text-slate-700 mb-1.5">New Password</label>

@@ -28,11 +28,21 @@ class LoginController extends Controller
             ]);
         }
 
+        // Block deactivated users
+        $user = Auth::user();
+        if (!$user->is_active) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            throw ValidationException::withMessages([
+                'email' => 'Your account has been deactivated. Please contact your school administrator.',
+            ]);
+        }
+
         $request->session()->regenerate();
 
         // Redirect to the correct portal based on role
-        $user = Auth::user();
-
         if ($user->isSuperAdmin()) {
             return redirect()->route('admin.dashboard');
         }

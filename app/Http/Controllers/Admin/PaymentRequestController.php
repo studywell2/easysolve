@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\PaymentRejectedMail;
+use App\Mail\SubscriptionActivatedMail;
 use App\Models\PaymentRequest;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class PaymentRequestController extends Controller
 {
@@ -79,6 +82,15 @@ class PaymentRequestController extends Controller
             'subscription_id' => $subscription->id,
         ]);
 
+        // Load relationships for email content
+        $subscription->load(['school.owner', 'plan']);
+
+        // Notify the school owner that their subscription is active
+        if ($subscription->school->owner) {
+            Mail::to($subscription->school->owner->email)
+                ->queue(new SubscriptionActivatedMail($subscription));
+        }
+
         return redirect()->route('admin.payment-requests.index')
             ->with('success', "Subscription activated for {$paymentRequest->school->name}. Valid until {$endsAt->format('M j, Y')}.");
     }
@@ -100,7 +112,17 @@ class PaymentRequestController extends Controller
             'verified_at' => now(),
         ]);
 
+        // Load relationships for email content
+        $paymentRequest->load(['school.owner', 'plan']);
+
+        // Notify the school owner that their payment was rejected
+        if ($paymentRequest->school->owner) {
+            Mail::to($paymentRequest->school->owner->email)
+                ->queue(new PaymentRejectedMail($paymentRequest));
+        }
+
         return redirect()->route('admin.payment-requests.index')
             ->with('success', "Payment request for {$paymentRequest->school->name} has been rejected.");
     }
 }
+

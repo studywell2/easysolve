@@ -58,7 +58,7 @@ class AnnouncementController extends Controller
             $validated['class_id'] = null;
         }
 
-        Announcement::create([
+        $announcement = Announcement::create([
             ...$validated,
             'school_id' => $schoolId,
             'created_by' => auth()->id(),

@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\School;
 
 use App\Http\Controllers\Controller;
+use App\Mail\PaymentRequestSubmittedMail;
 use App\Models\PaymentRequest;
 use App\Models\Plan;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 
 class BillingController extends Controller
@@ -33,6 +36,11 @@ class BillingController extends Controller
      */
     public function store(Request $request)
     {
+        // Only owners and admins can submit payment requests
+        if (!in_array(auth()->user()->role, ['owner', 'admin'])) {
+            abort(403, 'Only school administrators can submit payment requests.');
+        }
+
         $school = auth()->user()->school;
 
         $validated = $request->validate([
@@ -54,7 +62,7 @@ class BillingController extends Controller
                 ->store('payment-proofs', 'public');
         }
 
-        PaymentRequest::create([
+        $paymentRequest = PaymentRequest::create([
             'school_id' => $school->id,
             'plan_id' => $validated['plan_id'],
             'billing_cycle' => $validated['billing_cycle'],
@@ -63,6 +71,22 @@ class BillingController extends Controller
             'notes' => $validated['notes'] ?? null,
             'status' => 'pending',
         ]);
+
+        // Load relationships needed for email content
+        $paymentRequest->load(['school.owner', 'plan']);
+
+        // Notify the school owner (confirmation)
+        if ($school->owner) {
+            Mail::to($school->owner->email)
+                ->queue(new PaymentRequestSubmittedMail($paymentRequest, forAdmin: false));
+        }
+
+        // Notify all platform super_admins
+        $admins = User::where('role', 'super_admin')->where('is_active', true)->get();
+        foreach ($admins as $admin) {
+            Mail::to($admin->email)
+                ->queue(new PaymentRequestSubmittedMail($paymentRequest, forAdmin: true));
+        }
 
         return redirect()->route('school.billing.index')
             ->with('success', 'Your payment request has been submitted. We will verify it and activate your subscription shortly.');

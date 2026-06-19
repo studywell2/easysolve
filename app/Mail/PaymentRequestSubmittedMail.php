@@ -2,7 +2,7 @@
 
 namespace App\Mail;
 
-use App\Models\User;
+use App\Models\PaymentRequest;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -10,26 +10,28 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class UserWelcomeMail extends Mailable implements ShouldQueue
+class PaymentRequestSubmittedMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
     public function __construct(
-        public User $user,
-        public string $password = '',
+        public PaymentRequest $paymentRequest,
+        public bool $forAdmin = false,
     ) {}
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Welcome to ' . config('app.name'),
+            subject: $this->forAdmin
+                ? 'New Payment Request — ' . $this->paymentRequest->school->name
+                : 'Payment Request Received — ' . config('app.name'),
         );
     }
 
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.user-welcome',
+            markdown: 'emails.payment-request-submitted',
         );
     }
 }
