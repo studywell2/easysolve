@@ -33,7 +33,7 @@
         .grid-pattern { background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
     </style>
 </head>
-<body class="min-h-screen font-sans flex">
+<body class="h-screen overflow-hidden font-sans flex">
 
     <!-- ====== LEFT: IMAGE PANEL ====== -->
     <div class="hidden lg:flex lg:w-2/5 xl:w-5/12 relative hero-gradient">
@@ -110,8 +110,8 @@
 
     <!-- ====== RIGHT: FORM PANEL ====== -->
     <div class="w-full lg:w-3/5 xl:w-7/12 flex flex-col bg-gray-50">
-        <div class="flex-1 flex items-start lg:items-center justify-center p-6 sm:p-10 lg:p-12 overflow-y-auto">
-        <div class="w-full max-w-2xl animate-fade-up py-8">
+        <div class="flex-1 flex items-center justify-center p-6 sm:p-10 lg:p-12 overflow-y-auto">
+        <div class="w-full max-w-2xl animate-fade-up pb-8">
             <!-- Mobile Logo -->
             <div class="lg:hidden text-center mb-8">
                 <a href="{{ route('home') }}" class="inline-flex items-center gap-2.5">
