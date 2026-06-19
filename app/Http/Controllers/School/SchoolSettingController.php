@@ -17,6 +17,7 @@ class SchoolSettingController extends Controller
 
     public function update(Request $request)
     {
+        $this->authorizeManager();
         $school = auth()->user()->school;
 
         $validated = $request->validate([
@@ -35,6 +36,7 @@ class SchoolSettingController extends Controller
 
     public function updateTerms(Request $request)
     {
+        $this->authorizeManager();
         $school = auth()->user()->school;
 
         $validated = $request->validate([
@@ -50,5 +52,12 @@ class SchoolSettingController extends Controller
         $request->user()->update(['terms_accepted_at' => now()]);
 
         return back()->with('success', 'Terms & Conditions updated successfully.');
+    }
+
+    private function authorizeManager(): void
+    {
+        if (!auth()->user()->canManageSchool()) {
+            abort(403, 'You do not have permission to perform this action.');
+        }
     }
 }

@@ -8,6 +8,7 @@ use App\Models\SchoolClass;
 use App\Models\Subject;
 use App\Models\Term;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class GradeController extends Controller
 {
@@ -59,11 +60,15 @@ class GradeController extends Controller
     public function store(Request $request)
     {
         $this->authorizeManager();
+        $schoolId = auth()->user()->school_id;
+
         $validated = $request->validate([
-            'student_id' => 'required|exists:users,id',
-            'class_id' => 'required|exists:classes,id',
-            'subject_id' => 'required|exists:subjects,id',
-            'term_id' => 'required|exists:terms,id',
+            'student_id' => ['required', Rule::exists('users', 'id')->where('school_id', $schoolId)->where('role', 'student')],
+            'class_id' => ['required', Rule::exists('classes', 'id')->where('school_id', $schoolId)],
+            'subject_id' => ['required', Rule::exists('subjects', 'id')->where('school_id', $schoolId)],
+            'term_id' => ['required', Rule::exists('terms', 'id')->where(function ($q) use ($schoolId) {
+                $q->whereHas('academicSession', fn($sq) => $sq->where('school_id', $schoolId));
+            })],
             'ca_score' => 'required|numeric|min:0|max:40',
             'exam_score' => 'required|numeric|min:0|max:60',
             'remarks' => 'nullable|string|max:500',
@@ -73,7 +78,7 @@ class GradeController extends Controller
 
         Grade::updateOrCreate(
             [
-                'school_id' => auth()->user()->school_id,
+                'school_id' => $schoolId,
                 'student_id' => $validated['student_id'],
                 'subject_id' => $validated['subject_id'],
                 'term_id' => $validated['term_id'],

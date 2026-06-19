@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Announcement;
 use App\Models\SchoolClass;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class AnnouncementController extends Controller
 {
@@ -39,23 +40,24 @@ class AnnouncementController extends Controller
     public function store(Request $request)
     {
         $this->authorizeManager();
+        $schoolId = auth()->user()->school_id;
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'body' => 'required|string|max:5000',
             'audience' => 'required|in:all,parents,students,class',
-            'class_id' => 'nullable|exists:classes,id',
+            'class_id' => ['nullable', Rule::exists('classes', 'id')->where('school_id', $schoolId)],
         ]);
 
         if ($validated['audience'] === 'class') {
-            $request->validate(['class_id' => 'required|exists:classes,id']);
+            $request->validate(['class_id' => 'required']);
         } else {
             $validated['class_id'] = null;
         }
 
         Announcement::create([
             ...$validated,
-            'school_id' => auth()->user()->school_id,
+            'school_id' => $schoolId,
             'created_by' => auth()->id(),
         ]);
 
@@ -83,16 +85,17 @@ class AnnouncementController extends Controller
     {
         $this->authorizeAccess($announcement);
         $this->authorizeManager();
+        $schoolId = auth()->user()->school_id;
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'body' => 'required|string|max:5000',
             'audience' => 'required|in:all,parents,students,class',
-            'class_id' => 'nullable|exists:classes,id',
+            'class_id' => ['nullable', Rule::exists('classes', 'id')->where('school_id', $schoolId)],
         ]);
 
         if ($validated['audience'] === 'class') {
-            $request->validate(['class_id' => 'required|exists:classes,id']);
+            $request->validate(['class_id' => 'required']);
         } else {
             $validated['class_id'] = null;
         }

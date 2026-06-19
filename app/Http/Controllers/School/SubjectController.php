@@ -10,6 +10,7 @@ class SubjectController extends Controller
 {
     public function index(Request $request)
     {
+        $this->authorizeManager();
         $schoolId = auth()->user()->school_id;
         $query = Subject::where('school_id', $schoolId)->withCount('classes');
 
@@ -27,11 +28,13 @@ class SubjectController extends Controller
 
     public function create()
     {
+        $this->authorizeManager();
         return view('school.subjects.create');
     }
 
     public function store(Request $request)
     {
+        $this->authorizeManager();
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'nullable|string|max:20|unique:subjects,code,NULL,id,school_id,' . auth()->user()->school_id,
@@ -49,6 +52,7 @@ class SubjectController extends Controller
     public function edit(Subject $subject)
     {
         $this->authorizeAccess($subject);
+        $this->authorizeManager();
 
         return view('school.subjects.edit', compact('subject'));
     }
@@ -56,6 +60,7 @@ class SubjectController extends Controller
     public function update(Request $request, Subject $subject)
     {
         $this->authorizeAccess($subject);
+        $this->authorizeManager();
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -71,6 +76,7 @@ class SubjectController extends Controller
     public function destroy(Subject $subject)
     {
         $this->authorizeAccess($subject);
+        $this->authorizeManager();
         $subject->delete();
 
         return redirect()->route('school.subjects.index')->with('success', 'Subject deleted successfully.');
@@ -80,6 +86,13 @@ class SubjectController extends Controller
     {
         if ($subject->school_id !== auth()->user()->school_id) {
             abort(403);
+        }
+    }
+
+    private function authorizeManager(): void
+    {
+        if (!auth()->user()->canManageSchool()) {
+            abort(403, 'You do not have permission to perform this action.');
         }
     }
 }

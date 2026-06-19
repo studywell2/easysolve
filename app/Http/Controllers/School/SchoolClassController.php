@@ -11,6 +11,7 @@ class SchoolClassController extends Controller
 {
     public function index(Request $request)
     {
+        $this->authorizeManager();
         $schoolId = auth()->user()->school_id;
         $query = SchoolClass::where('school_id', $schoolId)->with(['sections', 'subjects']);
 
@@ -29,11 +30,13 @@ class SchoolClassController extends Controller
 
     public function create()
     {
+        $this->authorizeManager();
         return view('school.classes.create');
     }
 
     public function store(Request $request)
     {
+        $this->authorizeManager();
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:500',
@@ -62,6 +65,7 @@ class SchoolClassController extends Controller
     public function show(SchoolClass $class)
     {
         $this->authorizeAccess($class);
+        $this->authorizeManager();
         $class->load(['sections.students', 'subjects', 'students']);
 
         return view('school.classes.show', compact('class'));
@@ -70,6 +74,7 @@ class SchoolClassController extends Controller
     public function edit(SchoolClass $class)
     {
         $this->authorizeAccess($class);
+        $this->authorizeManager();
         $class->load('sections');
 
         return view('school.classes.edit', compact('class'));
@@ -78,6 +83,7 @@ class SchoolClassController extends Controller
     public function update(Request $request, SchoolClass $class)
     {
         $this->authorizeAccess($class);
+        $this->authorizeManager();
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -120,6 +126,7 @@ class SchoolClassController extends Controller
     public function destroy(SchoolClass $class)
     {
         $this->authorizeAccess($class);
+        $this->authorizeManager();
 
         if ($class->students()->exists()) {
             return back()->with('error', 'Cannot delete class with assigned students.');
@@ -134,6 +141,13 @@ class SchoolClassController extends Controller
     {
         if ($class->school_id !== auth()->user()->school_id) {
             abort(403);
+        }
+    }
+
+    private function authorizeManager(): void
+    {
+        if (!auth()->user()->canManageSchool()) {
+            abort(403, 'You do not have permission to perform this action.');
         }
     }
 }

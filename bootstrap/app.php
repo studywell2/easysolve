@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\EnsureIsAdmin::class,
             'school' => \App\Http\Middleware\EnsureSchoolUser::class,
             'terms' => \App\Http\Middleware\EnsureTermsAccepted::class,
+            'subscription' => \App\Http\Middleware\EnsureSubscriptionActive::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

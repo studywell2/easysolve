@@ -11,6 +11,7 @@ class AcademicSessionController extends Controller
 {
     public function index(Request $request)
     {
+        $this->authorizeManager();
         $schoolId = auth()->user()->school_id;
         $sessions = AcademicSession::where('school_id', $schoolId)
             ->with('terms')
@@ -22,11 +23,13 @@ class AcademicSessionController extends Controller
 
     public function create()
     {
+        $this->authorizeManager();
         return view('school.sessions.create');
     }
 
     public function store(Request $request)
     {
+        $this->authorizeManager();
         // Filter out empty term rows before validation
         if ($request->has('terms')) {
             $filteredTerms = collect($request->input('terms', []))
@@ -72,6 +75,7 @@ class AcademicSessionController extends Controller
     public function edit(AcademicSession $session)
     {
         $this->authorizeAccess($session);
+        $this->authorizeManager();
         $session->load('terms');
 
         return view('school.sessions.edit', compact('session'));
@@ -80,6 +84,7 @@ class AcademicSessionController extends Controller
     public function update(Request $request, AcademicSession $session)
     {
         $this->authorizeAccess($session);
+        $this->authorizeManager();
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -101,6 +106,7 @@ class AcademicSessionController extends Controller
     public function destroy(AcademicSession $session)
     {
         $this->authorizeAccess($session);
+        $this->authorizeManager();
         $session->delete();
 
         return redirect()->route('school.sessions.index')->with('success', 'Academic session deleted successfully.');
@@ -108,6 +114,7 @@ class AcademicSessionController extends Controller
 
     public function setCurrentTerm(Term $term)
     {
+        $this->authorizeManager();
         $session = $term->academicSession;
 
         if ($session->school_id !== auth()->user()->school_id) {
@@ -125,6 +132,13 @@ class AcademicSessionController extends Controller
     {
         if ($session->school_id !== auth()->user()->school_id) {
             abort(403);
+        }
+    }
+
+    private function authorizeManager(): void
+    {
+        if (!auth()->user()->canManageSchool()) {
+            abort(403, 'You do not have permission to perform this action.');
         }
     }
 }

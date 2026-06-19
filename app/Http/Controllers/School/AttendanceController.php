@@ -7,6 +7,7 @@ use App\Models\Attendance;
 use App\Models\SchoolClass;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class AttendanceController extends Controller
 {
@@ -122,11 +123,13 @@ class AttendanceController extends Controller
     public function store(Request $request)
     {
         $this->authorizeManager();
+        $schoolId = auth()->user()->school_id;
+
         $validated = $request->validate([
-            'class_id' => 'required|exists:classes,id',
+            'class_id' => ['required', Rule::exists('classes', 'id')->where('school_id', $schoolId)],
             'date' => 'required|date',
             'attendance' => 'required|array',
-            'attendance.*.student_id' => 'required|exists:users,id',
+            'attendance.*.student_id' => ['required', Rule::exists('users', 'id')->where('school_id', $schoolId)->where('role', 'student')],
             'attendance.*.status' => 'required|in:present,absent,late,excused',
         ]);
 
@@ -152,9 +155,12 @@ class AttendanceController extends Controller
 
     public function getStudents(Request $request)
     {
-        $request->validate(['class_id' => 'required|exists:classes,id']);
+        $schoolId = auth()->user()->school_id;
+        $request->validate([
+            'class_id' => ['required', Rule::exists('classes', 'id')->where('school_id', $schoolId)],
+        ]);
 
-        $students = User::where('school_id', auth()->user()->school_id)
+        $students = User::where('school_id', $schoolId)
             ->where('class_id', $request->class_id)
             ->where('role', 'student')
             ->orderBy('last_name')

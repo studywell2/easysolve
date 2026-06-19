@@ -7,6 +7,7 @@ use App\Models\Fee;
 use App\Models\SchoolClass;
 use App\Models\Term;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class FeeController extends Controller
 {
@@ -26,6 +27,7 @@ class FeeController extends Controller
 
     public function create()
     {
+        $this->authorizeManager();
         $schoolId = auth()->user()->school_id;
         $classes = SchoolClass::where('school_id', $schoolId)->active()->get();
         $terms = Term::whereHas('academicSession', fn($q) => $q->where('school_id', $schoolId))->get();
@@ -35,16 +37,21 @@ class FeeController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorizeManager();
+        $schoolId = auth()->user()->school_id;
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
-            'class_id' => 'nullable|exists:classes,id',
-            'term_id' => 'nullable|exists:terms,id',
+            'class_id' => ['nullable', Rule::exists('classes', 'id')->where('school_id', $schoolId)],
+            'term_id' => ['nullable', Rule::exists('terms', 'id')->where(function ($q) use ($schoolId) {
+                $q->whereHas('academicSession', fn($sq) => $sq->where('school_id', $schoolId));
+            })],
             'description' => 'nullable|string|max:500',
             'status' => 'required|in:active,inactive',
         ]);
 
-        Fee::create([...$validated, 'school_id' => auth()->user()->school_id]);
+        Fee::create([...$validated, 'school_id' => $schoolId]);
 
         return redirect()->route('school.fees.index')->with('success', 'Fee created successfully.');
     }
@@ -52,6 +59,7 @@ class FeeController extends Controller
     public function edit(Fee $fee)
     {
         $this->authorizeAccess($fee);
+        $this->authorizeManager();
         $schoolId = auth()->user()->school_id;
         $classes = SchoolClass::where('school_id', $schoolId)->active()->get();
         $terms = Term::whereHas('academicSession', fn($q) => $q->where('school_id', $schoolId))->get();
@@ -62,12 +70,16 @@ class FeeController extends Controller
     public function update(Request $request, Fee $fee)
     {
         $this->authorizeAccess($fee);
+        $this->authorizeManager();
+        $schoolId = auth()->user()->school_id;
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
-            'class_id' => 'nullable|exists:classes,id',
-            'term_id' => 'nullable|exists:terms,id',
+            'class_id' => ['nullable', Rule::exists('classes', 'id')->where('school_id', $schoolId)],
+            'term_id' => ['nullable', Rule::exists('terms', 'id')->where(function ($q) use ($schoolId) {
+                $q->whereHas('academicSession', fn($sq) => $sq->where('school_id', $schoolId));
+            })],
             'description' => 'nullable|string|max:500',
             'status' => 'required|in:active,inactive',
         ]);
@@ -80,6 +92,7 @@ class FeeController extends Controller
     public function destroy(Fee $fee)
     {
         $this->authorizeAccess($fee);
+        $this->authorizeManager();
         $fee->delete();
 
         return redirect()->route('school.fees.index')->with('success', 'Fee deleted successfully.');
@@ -89,6 +102,13 @@ class FeeController extends Controller
     {
         if ($fee->school_id !== auth()->user()->school_id) {
             abort(403);
+        }
+    }
+
+    private function authorizeManager(): void
+    {
+        if (!auth()->user()->canManageSchool()) {
+            abort(403, 'You do not have permission to perform this action.');
         }
     }
 }

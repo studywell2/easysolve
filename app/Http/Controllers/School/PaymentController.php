@@ -7,17 +7,25 @@ use App\Models\Payment;
 use App\Models\Fee;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PaymentController extends Controller
 {
     public function index(Request $request)
     {
-        $schoolId = auth()->user()->school_id;
+        $user = auth()->user();
+        $schoolId = $user->school_id;
         $query = Payment::where('school_id', $schoolId)->with(['student', 'fee']);
 
         // Students only see their own payments
-        if (auth()->user()->isStudent()) {
-            $query->where('student_id', auth()->id());
+        if ($user->isStudent()) {
+            $query->where('student_id', $user->id);
+        }
+
+        // Parents only see their children's payments
+        if ($user->isParent()) {
+            $childIds = $user->children()->pluck('id');
+            $query->whereIn('student_id', $childIds);
         }
 
         if ($request->filled('status')) {
@@ -46,9 +54,11 @@ class PaymentController extends Controller
     public function store(Request $request)
     {
         $this->authorizeManager();
+        $schoolId = auth()->user()->school_id;
+
         $validated = $request->validate([
-            'student_id' => 'required|exists:users,id',
-            'fee_id' => 'required|exists:fees,id',
+            'student_id' => ['required', Rule::exists('users', 'id')->where('school_id', $schoolId)->where('role', 'student')],
+            'fee_id' => ['required', Rule::exists('fees', 'id')->where('school_id', $schoolId)],
             'amount' => 'required|numeric|min:1',
             'payment_method' => 'required|in:cash,bank_transfer,card,online,cheque',
             'reference' => 'nullable|string|max:255',
@@ -61,7 +71,7 @@ class PaymentController extends Controller
 
         Payment::create([
             ...$validated,
-            'school_id' => auth()->user()->school_id,
+            'school_id' => $schoolId,
             'balance' => $balance,
             'recorded_by' => auth()->id(),
             'paid_at' => $validated['paid_at'] ?? now(),
