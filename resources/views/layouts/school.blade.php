@@ -25,7 +25,7 @@
         }
     </script>
     <style>
-        /* ====== Sidebar (Light Theme) ====== */
+        /* ====== Sidebar (Clean White Professional) ====== */
         .sidebar-link {
             @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200 relative group/link text-slate-600;
         }
@@ -33,19 +33,18 @@
             @apply transition-all duration-200 text-slate-400;
         }
         .sidebar-link:hover {
-            @apply bg-slate-100 text-slate-900;
+            @apply bg-gray-50 text-slate-900;
         }
         .sidebar-link:hover .sidebar-icon {
-            @apply scale-110 text-slate-600;
+            @apply text-slate-600;
         }
         .sidebar-link.active {
             @apply text-brand-700 font-semibold;
-            background: linear-gradient(135deg, rgba(37,99,235,0.08) 0%, rgba(79,70,229,0.06) 100%);
-            box-shadow: 0 2px 12px -4px rgba(37,99,235,0.18);
+            background: #eff6ff;
         }
         .sidebar-link.active::before {
             content: '';
-            @apply absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-7 bg-brand-600 rounded-r-full;
+            @apply absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-7 rounded-r-full bg-brand-500;
         }
         .sidebar-link.active .sidebar-icon {
             @apply text-brand-600;
@@ -58,20 +57,21 @@
         .sidebar-collapsed .sidebar-link::after {
             content: attr(data-tooltip);
             @apply absolute left-full ml-3 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-lg whitespace-nowrap opacity-0 pointer-events-none transition-opacity duration-200 shadow-xl z-[999];
+            border: 1px solid rgba(0,0,0,0.06);
         }
         .sidebar-collapsed .sidebar-link:hover::after {
             @apply opacity-100;
         }
 
         .sidebar-section {
-            @apply text-[10px] font-bold text-slate-400 uppercase tracking-[0.12em] px-3 mb-2 mt-6 first:mt-0 flex items-center gap-3 cursor-pointer select-none group/section;
+            @apply text-[10px] font-bold text-gray-400 uppercase tracking-[0.12em] px-3 mb-2 mt-6 first:mt-0 flex items-center gap-3 cursor-pointer select-none group/section;
         }
         .sidebar-section::after {
             content: '';
-            @apply flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent;
+            @apply flex-1 h-px bg-gray-100;
         }
         .sidebar-section:hover {
-            @apply text-slate-600;
+            @apply text-slate-500;
         }
 
         /* Collapsed */
@@ -93,13 +93,10 @@
         /* Scrollbar (light) */
         .sidebar-scroll::-webkit-scrollbar { width: 3px; }
         .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
-        .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.06); border-radius: 4px; }
-        .sidebar-scroll::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.12); }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.08); border-radius: 4px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.15); }
 
-        /* Grid pattern for sidebar */
-        .sidebar-grid-pattern {
-            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.012'%3E%3Ccircle cx='20' cy='20' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        }
+        
 
         /* ====== Topbar ====== */
         .topbar-search {
@@ -165,11 +162,11 @@
     <!-- ========== SCHOOL MANAGER LAYOUT (New Sidebar) ========== -->
     <div id="sidebar-overlay" class="sidebar-overlay hidden" onclick="toggleMobileSidebar()"></div>
 
-    <aside id="sidebar" class="fixed top-0 left-0 z-50 h-full flex flex-col transition-all duration-300 w-[272px] -translate-x-full lg:translate-x-0 shadow-xl border-r border-gray-200/80 bg-white sidebar-grid-pattern">
+    <aside id="sidebar" class="fixed top-0 left-0 z-50 h-full flex flex-col transition-all duration-300 w-[272px] -translate-x-full lg:translate-x-0 shadow-xl shadow-black/5 border-r border-gray-200 bg-white">
 
         <!-- Logo & School Branding -->
-        <div class="flex items-center gap-3 px-5 h-[68px] border-b border-gray-200/60 flex-shrink-0">
-            <div class="w-10 h-10 bg-gradient-to-br from-brand-400 to-indigo-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-brand-600/30 relative">
+                <div class="flex items-center gap-3 px-5 h-[68px] border-b border-gray-100 flex-shrink-0">
+            <div class="w-10 h-10 bg-gradient-to-br from-brand-400 to-indigo-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-brand-600/40 relative">
                 <span class="text-white font-extrabold text-sm">ES</span>
             </div>
             <div class="sidebar-logo-text min-w-0">
@@ -186,7 +183,7 @@
                     </span>
                 @else
                     <span class="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-600 tracking-[0.12em] uppercase">
-                        <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838l-3.11 1.333L10 12l6.394-2.74a1 1 0 000-1.84l-7-3zM5.26 10.292L10 12.327l4.74-2.035L10 14l-4.74-3.708z"/></svg>
+                        <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838l-3.11 1.333L10 12l6.394-2.74a1 1 0 000-1.84l-7-3z"/></svg>
                         Teacher Portal
                     </span>
                 @endif
@@ -200,8 +197,8 @@
             <div class="flex items-center gap-2">
                 <svg class="w-3.5 h-3.5 text-indigo-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
                 <div class="min-w-0">
-                    <p class="text-[9px] font-bold text-indigo-500 uppercase tracking-wider">Active Term</p>
-                    <p class="text-[11px] font-medium text-slate-700 truncate">{{ $currentTerm->name }}</p>
+                    <p class="text-[9px] font-bold text-indigo-600 uppercase tracking-wider">Active Term</p>
+                    <p class="text-[11px] font-medium text-slate-600 truncate">{{ $currentTerm->name }}</p>
                 </div>
             </div>
         </div>
@@ -214,8 +211,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
                 </svg>
                 <input type="text" id="sidebar-search" placeholder="Search menu…" autocomplete="off"
-                    class="w-full pl-9 pr-8 py-2 bg-gray-100 border border-gray-200 rounded-xl text-[12px] text-slate-700 placeholder-slate-400 focus:bg-white focus:border-brand-500/30 focus:ring-1 focus:ring-brand-500/20 outline-none transition-all duration-200">
-                <button id="sidebar-search-clear" class="hidden absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded-md text-slate-400 hover:text-slate-600 hover:bg-gray-100 transition" onclick="clearSidebarSearch()">
+                    class="w-full pl-9 pr-8 py-2 bg-gray-100 border border-gray-200 rounded-xl text-[12px] text-slate-700 placeholder-slate-400 focus:bg-white focus:border-brand-500 focus:ring-1 focus:ring-brand-500/20 outline-none transition-all duration-200">
+                <button id="sidebar-search-clear" class="hidden absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded-md text-slate-400 hover:text-slate-600 hover:bg-gray-200 transition" onclick="clearSidebarSearch()">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
@@ -226,7 +223,7 @@
             <p class="no-results-msg hidden text-center text-slate-400 text-[12px] py-8">No results found</p>
 
             {{-- Overview --}}
-            <div class="sidebar-section" data-section="overview" onclick="toggleSection(this)">Overview<svg class="w-3 h-3 text-slate-400 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
+            <div class="sidebar-section" data-section="overview" onclick="toggleSection(this)">Overview<svg class="w-3 h-3 text-gray-400 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
 
             <a href="{{ route('school.dashboard') }}" data-tooltip="Dashboard" data-nav-text="Dashboard" class="sidebar-link {{ request()->routeIs('school.dashboard') ? 'active' : 'text-slate-600' }}">
                 <svg class="sidebar-icon w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -237,7 +234,7 @@
 
             {{-- People (Owner & Admin only) --}}
             @if(auth()->user()->isOwner() || auth()->user()->isAdmin())
-            <div class="sidebar-section" data-section="people" onclick="toggleSection(this)">People<svg class="w-3 h-3 text-slate-400 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
+            <div class="sidebar-section" data-section="people" onclick="toggleSection(this)">People<svg class="w-3 h-3 text-gray-400 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
 
             <a href="{{ route('school.users.index') }}" data-tooltip="Users" data-nav-text="Users" class="sidebar-link {{ request()->routeIs('school.users.*') ? 'active' : 'text-slate-600' }}">
                 <svg class="sidebar-icon w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -249,7 +246,7 @@
             @endif
 
             {{-- Academics --}}
-            <div class="sidebar-section" data-section="academics" onclick="toggleSection(this)">Academics<svg class="w-3 h-3 text-slate-400 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
+            <div class="sidebar-section" data-section="academics" onclick="toggleSection(this)">Academics<svg class="w-3 h-3 text-gray-400 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
 
             @if(auth()->user()->isOwner() || auth()->user()->isAdmin())
             <a href="{{ route('school.classes.index') }}" data-tooltip="Classes" data-nav-text="Classes" class="sidebar-link {{ request()->routeIs('school.classes.*') ? 'active' : 'text-slate-600' }}">
@@ -290,7 +287,7 @@
             </a>
 
             {{-- Communication --}}
-            <div class="sidebar-section" data-section="communication" onclick="toggleSection(this)">Communication<svg class="w-3 h-3 text-slate-400 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
+            <div class="sidebar-section" data-section="communication" onclick="toggleSection(this)">Communication<svg class="w-3 h-3 text-gray-400 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
 
             <a href="{{ route('school.announcements.index') }}" data-tooltip="Announcements" data-nav-text="Announcements" class="sidebar-link {{ request()->routeIs('school.announcements.*') ? 'active' : 'text-slate-600' }}">
                 <svg class="sidebar-icon w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -308,7 +305,7 @@
 
             {{-- Finance (Owner & Admin only) --}}
             @if(auth()->user()->isOwner() || auth()->user()->isAdmin())
-            <div class="sidebar-section" data-section="finance" onclick="toggleSection(this)">Finance<svg class="w-3 h-3 text-slate-400 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
+            <div class="sidebar-section" data-section="finance" onclick="toggleSection(this)">Finance<svg class="w-3 h-3 text-gray-400 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
 
             <a href="{{ route('school.fees.index') }}" data-tooltip="Fees" data-nav-text="Fee Structure" class="sidebar-link {{ request()->routeIs('school.fees.*') ? 'active' : 'text-slate-600' }}">
                 <svg class="sidebar-icon w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -328,7 +325,7 @@
 
             {{-- Insights (Owner & Admin only) --}}
             @if(auth()->user()->isOwner() || auth()->user()->isAdmin())
-            <div class="sidebar-section" data-section="insights" onclick="toggleSection(this)">Insights<svg class="w-3 h-3 text-slate-400 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
+            <div class="sidebar-section" data-section="insights" onclick="toggleSection(this)">Insights<svg class="w-3 h-3 text-gray-400 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
 
             <a href="{{ route('school.reports.index') }}" data-tooltip="Reports" data-nav-text="Reports" class="sidebar-link {{ request()->routeIs('school.reports.*') ? 'active' : 'text-slate-600' }}">
                 <svg class="sidebar-icon w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -340,7 +337,7 @@
 
             {{-- Account / School Settings --}}
             @if(auth()->user()->isOwner())
-            <div class="sidebar-section" data-section="school" onclick="toggleSection(this)">School<svg class="w-3 h-3 text-slate-400 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
+            <div class="sidebar-section" data-section="school" onclick="toggleSection(this)">School<svg class="w-3 h-3 text-gray-400 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
 
             <a href="{{ route('school.settings.index') }}" data-tooltip="School Settings" data-nav-text="School Settings" class="sidebar-link {{ request()->routeIs('school.settings.*') ? 'active' : 'text-slate-600' }}">
                 <svg class="sidebar-icon w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -351,8 +348,19 @@
                     <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                 </span>
             </a>
+
+            <a href="{{ route('school.billing.index') }}" data-tooltip="Billing & Subscription" data-nav-text="Billing" class="sidebar-link {{ request()->routeIs('school.billing.*') ? 'active' : 'text-slate-600' }}">
+                <svg class="sidebar-icon w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v8.25A2.25 2.25 0 004.5 15z"/>
+                </svg>
+                <span class="sidebar-text">Billing</span>
+                @php $pendingCount = auth()->user()->school?->paymentRequests()->where('status', 'pending')->count() ?? 0; @endphp
+                @if($pendingCount > 0)
+                <span class="sidebar-badge ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-600">{{ $pendingCount }}</span>
+                @endif
+            </a>
             @else
-            <div class="sidebar-section" data-section="account" onclick="toggleSection(this)">Account<svg class="w-3 h-3 text-slate-400 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
+            <div class="sidebar-section" data-section="account" onclick="toggleSection(this)">Account<svg class="w-3 h-3 text-gray-400 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
 
             <a href="{{ route('school.settings.index') }}" data-tooltip="Settings" data-nav-text="Settings" class="sidebar-link {{ request()->routeIs('school.settings.*') ? 'active' : 'text-slate-600' }}">
                 <svg class="sidebar-icon w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -374,10 +382,10 @@
         </nav>
 
         <!-- User Card -->
-        <div class="px-3 py-3 border-t border-gray-200/60 flex-shrink-0">
+        <div class="px-3 py-3 border-t border-gray-100 flex-shrink-0">
             <div class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors duration-200">
                 <div class="relative flex-shrink-0">
-                    <div class="w-10 h-10 rounded-xl {{ auth()->user()->isOwner() ? 'bg-gradient-to-br from-amber-400 to-orange-500 shadow-amber-500/20' : 'bg-gradient-to-br from-brand-400 to-indigo-500 shadow-brand-500/20' }} flex items-center justify-center text-white font-bold text-xs shadow-lg ring-2 {{ auth()->user()->isOwner() ? 'ring-amber-200' : 'ring-brand-200' }}">
+                    <div class="w-10 h-10 rounded-xl {{ auth()->user()->isOwner() ? 'bg-gradient-to-br from-amber-400 to-orange-500 shadow-amber-500/20' : 'bg-gradient-to-br from-brand-400 to-indigo-500 shadow-brand-500/20' }} flex items-center justify-center text-white font-bold text-xs shadow-lg ring-2 {{ auth()->user()->isOwner() ? 'ring-amber-400/20' : 'ring-brand-400/20' }}">
                         {{ auth()->user()->initials }}
                     </div>
                     <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-white"></div>
@@ -385,7 +393,7 @@
                 <div class="sidebar-user-info min-w-0 flex-1">
                     <p class="text-[13px] font-semibold text-slate-800 truncate">{{ auth()->user()->full_name }}</p>
                     <div class="flex items-center gap-1.5 mt-0.5">
-                        <span class="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded {{ auth()->user()->isOwner() ? 'bg-amber-50 text-amber-700' : (auth()->user()->isAdmin() ? 'bg-brand-50 text-brand-700' : 'bg-emerald-50 text-emerald-700') }}">
+                        <span class="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded {{ auth()->user()->isOwner() ? 'bg-amber-50 text-amber-600' : (auth()->user()->isAdmin() ? 'bg-brand-50 text-brand-600' : 'bg-emerald-50 text-emerald-600') }}">
                             @if(auth()->user()->isOwner())
                             <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                             Owner
@@ -401,7 +409,7 @@
                 </div>
                 <form method="POST" action="{{ route('logout') }}" class="sidebar-user-info flex-shrink-0">
                     @csrf
-                    <button type="submit" class="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all duration-200" title="Sign out">
+                    <button type="submit" class="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200" title="Sign out">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/>
                         </svg>
@@ -411,8 +419,8 @@
         </div>
 
         <!-- Collapse toggle -->
-        <div class="px-3 py-2 border-t border-gray-200/60 flex-shrink-0">
-            <button onclick="toggleSidebar()" class="sidebar-link w-full text-slate-400 hover:text-slate-600 hover:bg-gray-100" title="Toggle sidebar">
+        <div class="px-3 py-2 border-t border-gray-100 flex-shrink-0">
+            <button onclick="toggleSidebar()" class="sidebar-link w-full text-slate-400 hover:text-slate-700 hover:bg-gray-50" title="Toggle sidebar">
                 <svg class="w-[18px] h-[18px] flex-shrink-0 transition-transform duration-300" id="collapse-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5"/>
                 </svg>

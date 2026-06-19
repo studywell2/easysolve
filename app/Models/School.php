@@ -92,6 +92,11 @@ class School extends Model
         return $this->hasMany(Subscription::class);
     }
 
+    public function paymentRequests()
+    {
+        return $this->hasMany(PaymentRequest::class);
+    }
+
     public function activeSubscription()
     {
         return $this->hasOne(Subscription::class)
@@ -119,7 +124,21 @@ class School extends Model
 
     public function hasActiveSubscription(): bool
     {
-        return $this->subscription_status === 'active';
+        if ($this->subscription_status !== 'active') {
+            return false;
+        }
+
+        // If a subscription record exists, verify it hasn't expired
+        $subscription = $this->subscriptions()
+            ->where('status', 'active')
+            ->latest('ends_at')
+            ->first();
+
+        if (! $subscription) {
+            return true; // No subscription record — trust the denormalized status
+        }
+
+        return $subscription->ends_at && $subscription->ends_at->isFuture();
     }
 
     public function getCurrentTermAttribute(): ?Term

@@ -25,25 +25,26 @@
         }
     </script>
     <style>
-        /* ====== Sidebar ====== */
+        /* ====== Sidebar (Clean White Professional) ====== */
         .sidebar-link {
-            @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200 relative group/link;
+            @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200 relative group/link text-slate-600;
         }
         .sidebar-link .sidebar-icon {
-            @apply transition-all duration-200;
+            @apply transition-all duration-200 text-slate-400;
         }
         .sidebar-link:hover {
-            @apply bg-brand-50 text-brand-700;
+            @apply bg-gray-50 text-slate-900;
         }
         .sidebar-link:hover .sidebar-icon {
-            @apply scale-110;
+            @apply text-slate-600;
         }
         .sidebar-link.active {
-            @apply bg-gradient-to-r from-brand-50 to-brand-100/50 text-brand-700 font-semibold;
+            @apply text-brand-700 font-semibold;
+            background: #eff6ff;
         }
         .sidebar-link.active::before {
             content: '';
-            @apply absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-brand-600 rounded-r-full;
+            @apply absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-7 rounded-r-full bg-brand-500;
         }
         .sidebar-link.active .sidebar-icon {
             @apply text-brand-600;
@@ -56,17 +57,18 @@
         .sidebar-collapsed .sidebar-link::after {
             content: attr(data-tooltip);
             @apply absolute left-full ml-3 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-lg whitespace-nowrap opacity-0 pointer-events-none transition-opacity duration-200 shadow-xl z-[999];
+            border: 1px solid rgba(0,0,0,0.06);
         }
         .sidebar-collapsed .sidebar-link:hover::after {
             @apply opacity-100;
         }
 
         .sidebar-section {
-            @apply text-[10px] font-bold text-slate-500 uppercase tracking-[0.12em] px-3 mb-2 mt-6 first:mt-0 flex items-center gap-3 cursor-pointer select-none group/section;
+            @apply text-[10px] font-bold text-gray-400 uppercase tracking-[0.12em] px-3 mb-2 mt-6 first:mt-0 flex items-center gap-3 cursor-pointer select-none group/section;
         }
         .sidebar-section::after {
             content: '';
-            @apply flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent;
+            @apply flex-1 h-px bg-gray-100;
         }
         .sidebar-section:hover .section-chevron {
             @apply text-slate-500;
@@ -89,7 +91,7 @@
         /* Overlay */
         .sidebar-overlay { @apply fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity lg:hidden; }
 
-        /* Scrollbar */
+        /* Scrollbar (light) */
         .sidebar-scroll::-webkit-scrollbar { width: 3px; }
         .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
         .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.08); border-radius: 4px; }
@@ -151,17 +153,17 @@
     <div id="sidebar-overlay" class="sidebar-overlay hidden" onclick="toggleMobileSidebar()"></div>
 
     <!-- ====== SIDEBAR ====== -->
-    <aside id="sidebar" class="fixed top-0 left-0 z-50 h-full bg-white flex flex-col transition-all duration-300 w-[272px] -translate-x-full lg:translate-x-0 shadow-xl shadow-gray-200/60 border-r border-gray-200/60">
+    <aside id="sidebar" class="fixed top-0 left-0 z-50 h-full bg-white flex flex-col transition-all duration-300 w-[272px] -translate-x-full lg:translate-x-0 shadow-xl shadow-black/5 border-r border-gray-200">
 
         <!-- Logo -->
         <div class="flex items-center gap-3 px-5 h-[72px] border-b border-gray-100 flex-shrink-0">
-            <div class="w-10 h-10 bg-gradient-to-br from-brand-400 to-brand-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-brand-600/30 relative">
+            <div class="w-10 h-10 bg-gradient-to-br from-brand-400 to-brand-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-brand-600/40 relative">
                 <span class="text-white font-extrabold text-sm">ES</span>
                 <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-white online-pulse"></div>
             </div>
             <div class="sidebar-logo-text">
                 <span class="text-[15px] font-bold text-slate-800 tracking-tight">EASYSOLVE</span>
-                <span class="block text-[9px] font-semibold text-brand-500 -mt-0.5 tracking-[0.15em] uppercase">Platform Admin</span>
+                <span class="block text-[9px] font-semibold text-brand-600 -mt-0.5 tracking-[0.15em] uppercase">Platform Admin</span>
             </div>
         </div>
 
@@ -172,8 +174,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
                 </svg>
                 <input type="text" id="sidebar-search" placeholder="Search menu…" autocomplete="off"
-                    class="w-full pl-9 pr-8 py-2 bg-gray-50 border border-gray-200 rounded-xl text-[12px] text-slate-600 placeholder-slate-400 focus:bg-white focus:border-brand-400 focus:ring-1 focus:ring-brand-500/20 outline-none transition-all duration-200">
-                <button id="sidebar-search-clear" class="hidden absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded-md text-slate-400 hover:text-slate-600 hover:bg-gray-100 transition" onclick="clearSidebarSearch()">
+                    class="w-full pl-9 pr-8 py-2 bg-gray-100 border border-gray-200 rounded-xl text-[12px] text-slate-700 placeholder-slate-400 focus:bg-white focus:border-brand-500 focus:ring-1 focus:ring-brand-500/20 outline-none transition-all duration-200">
+                <button id="sidebar-search-clear" class="hidden absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded-md text-slate-400 hover:text-slate-600 hover:bg-gray-200 transition" onclick="clearSidebarSearch()">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
@@ -181,12 +183,12 @@
 
         <!-- Navigation -->
         <nav class="flex-1 overflow-y-auto sidebar-scroll px-3 py-3 space-y-0.5" id="sidebar-nav">
-            <p class="no-results-msg hidden text-center text-slate-500 text-[12px] py-8">No results found</p>
+            <p class="no-results-msg hidden text-center text-slate-400 text-[12px] py-8">No results found</p>
 
             {{-- Overview --}}
-            <div class="sidebar-section" data-section="overview" onclick="toggleSection(this)">Overview<svg class="w-3 h-3 text-slate-600 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
+            <div class="sidebar-section" data-section="overview" onclick="toggleSection(this)">Overview<svg class="w-3 h-3 text-gray-400 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
 
-            <a href="{{ route('admin.dashboard') }}" data-tooltip="Dashboard" data-nav-text="Dashboard" class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : 'text-slate-500' }}">
+            <a href="{{ route('admin.dashboard') }}" data-tooltip="Dashboard" data-nav-text="Dashboard" class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : 'text-slate-600' }}">
                 <svg class="sidebar-icon w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25a2.25 2.25 0 01-2.25-2.25v-2.25z"/>
                 </svg>
@@ -194,9 +196,9 @@
             </a>
 
             {{-- Management --}}
-            <div class="sidebar-section" data-section="management" onclick="toggleSection(this)">Management<svg class="w-3 h-3 text-slate-600 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
+            <div class="sidebar-section" data-section="management" onclick="toggleSection(this)">Management<svg class="w-3 h-3 text-gray-400 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
 
-            <a href="{{ route('admin.schools.index') }}" data-tooltip="Schools" data-nav-text="Schools" class="sidebar-link {{ request()->routeIs('admin.schools.*') ? 'active' : 'text-slate-500' }}">
+            <a href="{{ route('admin.schools.index') }}" data-tooltip="Schools" data-nav-text="Schools" class="sidebar-link {{ request()->routeIs('admin.schools.*') ? 'active' : 'text-slate-600' }}">
                 <svg class="sidebar-icon w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z"/>
                 </svg>
@@ -204,14 +206,14 @@
                 <span class="sidebar-badge ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-50 text-brand-600">{{ \App\Models\School::count() }}</span>
             </a>
 
-            <a href="{{ route('admin.schools.create', ['setup' => 1]) }}" data-tooltip="Add School" data-nav-text="Add School" class="sidebar-link {{ request()->routeIs('admin.schools.create') ? 'active' : 'text-slate-500' }}">
+            <a href="{{ route('admin.schools.create', ['setup' => 1]) }}" data-tooltip="Add School" data-nav-text="Add School" class="sidebar-link {{ request()->routeIs('admin.schools.create') ? 'active' : 'text-slate-600' }}">
                 <svg class="sidebar-icon w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
                 </svg>
                 <span class="sidebar-text">Add School</span>
             </a>
 
-            <a href="{{ route('admin.plans.index') }}" data-tooltip="Subscription Plans" data-nav-text="Plans" class="sidebar-link {{ request()->routeIs('admin.plans.*') ? 'active' : 'text-slate-500' }}">
+            <a href="{{ route('admin.plans.index') }}" data-tooltip="Subscription Plans" data-nav-text="Plans" class="sidebar-link {{ request()->routeIs('admin.plans.*') ? 'active' : 'text-slate-600' }}">
                 <svg class="sidebar-icon w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5M3.75 3h16.5M3.75 15a1.5 1.5 0 010 3M20.25 15a1.5 1.5 0 010 3M3.75 9a1.5 1.5 0 010-3M20.25 9a1.5 1.5 0 010-3"/>
                 </svg>
@@ -219,10 +221,21 @@
                 <span class="sidebar-badge ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600">{{ \App\Models\Plan::count() }}</span>
             </a>
 
-            {{-- System --}}
-            <div class="sidebar-section" data-section="system" onclick="toggleSection(this)">System<svg class="w-3 h-3 text-slate-600 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
+            @php $pendingPayments = \App\Models\PaymentRequest::where('status', 'pending')->count(); @endphp
+            <a href="{{ route('admin.payment-requests.index') }}" data-tooltip="Payment Requests" data-nav-text="Payment Requests" class="sidebar-link {{ request()->routeIs('admin.payment-requests.*') ? 'active' : 'text-slate-600' }}">
+                <svg class="sidebar-icon w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/>
+                </svg>
+                <span class="sidebar-text">Payment Requests</span>
+                @if($pendingPayments > 0)
+                <span class="sidebar-badge ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 animate-pulse">{{ $pendingPayments }}</span>
+                @endif
+            </a>
 
-            <a href="{{ route('admin.settings.index') }}" data-tooltip="Settings" data-nav-text="Settings" class="sidebar-link {{ request()->routeIs('admin.settings.*') ? 'active' : 'text-slate-500' }}">
+            {{-- System --}}
+            <div class="sidebar-section" data-section="system" onclick="toggleSection(this)">System<svg class="w-3 h-3 text-gray-400 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
+
+            <a href="{{ route('admin.settings.index') }}" data-tooltip="Settings" data-nav-text="Settings" class="sidebar-link {{ request()->routeIs('admin.settings.*') ? 'active' : 'text-slate-600' }}">
                 <svg class="sidebar-icon w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -231,10 +244,10 @@
             </a>
 
             {{-- External Links --}}
-            <div class="sidebar-section" data-section="external" onclick="toggleSection(this)">External<svg class="w-3 h-3 text-slate-600 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
+            <div class="sidebar-section" data-section="external" onclick="toggleSection(this)">External<svg class="w-3 h-3 text-gray-400 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
 
             <div class="sidebar-external">
-                <a href="{{ route('home') }}" data-tooltip="View Website" data-nav-text="View Website" target="_blank" class="sidebar-link text-slate-500">
+                <a href="{{ route('home') }}" data-tooltip="View Website" data-nav-text="View Website" target="_blank" class="sidebar-link text-slate-600">
                     <svg class="sidebar-icon w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"/>
                     </svg>
@@ -242,7 +255,7 @@
                     <svg class="w-3 h-3 ml-auto text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
                 </a>
 
-                <a href="{{ route('help') }}" data-tooltip="Help & Support" data-nav-text="Help & Support" target="_blank" class="sidebar-link text-slate-500">
+                <a href="{{ route('help') }}" data-tooltip="Help & Support" data-nav-text="Help & Support" target="_blank" class="sidebar-link text-slate-600">
                     <svg class="sidebar-icon w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/>
                     </svg>
@@ -258,26 +271,26 @@
                 $activeSchools = \App\Models\School::where('subscription_status', 'active')->count();
                 $trialSchools = \App\Models\School::where('subscription_status', 'trial')->count();
             @endphp
-            <div class="rounded-xl bg-gray-50 border border-gray-100 p-3.5">
+            <div class="rounded-xl bg-gray-50 border border-gray-200 p-3.5">
                 <div class="flex items-center justify-between mb-2.5">
-                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Platform Health</span>
-                    <span class="flex items-center gap-1 text-[10px] font-bold text-emerald-400">
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Platform Health</span>
+                    <span class="flex items-center gap-1 text-[10px] font-bold text-emerald-600">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                         Operational
                     </span>
                 </div>
                 <div class="space-y-2">
                     <div class="flex items-center justify-between text-[11px]">
-                        <span class="text-slate-400">Active</span>
-                        <span class="font-bold text-emerald-400">{{ $activeSchools }} / {{ $totalSchools }}</span>
+                        <span class="text-gray-500">Active</span>
+                        <span class="font-bold text-emerald-600">{{ $activeSchools }} / {{ $totalSchools }}</span>
                     </div>
                     <div class="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
                         <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500" style="width: {{ $totalSchools > 0 ? ($activeSchools / $totalSchools) * 100 : 0 }}%"></div>
                     </div>
                     @if($trialSchools > 0)
                     <div class="flex items-center justify-between text-[11px] pt-1">
-                        <span class="text-slate-400">On Trial</span>
-                        <span class="font-bold text-amber-400">{{ $trialSchools }}</span>
+                        <span class="text-gray-500">On Trial</span>
+                        <span class="font-bold text-amber-600">{{ $trialSchools }}</span>
                     </div>
                     @endif
                 </div>
@@ -304,7 +317,7 @@
                 </div>
                 <form method="POST" action="{{ route('logout') }}" class="sidebar-user-info flex-shrink-0">
                     @csrf
-                    <button type="submit" class="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200" title="Sign out">
+                    <button type="submit" class="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200" title="Sign out">
                         <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/>
                         </svg>
@@ -315,7 +328,7 @@
 
         <!-- Collapse toggle -->
         <div class="px-3 py-2 border-t border-gray-100 flex-shrink-0">
-            <button onclick="toggleSidebar()" class="sidebar-link w-full text-slate-400 hover:text-slate-600 hover:bg-gray-50" title="Toggle sidebar">
+            <button onclick="toggleSidebar()" class="sidebar-link w-full text-slate-400 hover:text-slate-700 hover:bg-gray-50" title="Toggle sidebar">
                 <svg class="w-[18px] h-[18px] flex-shrink-0 transition-transform duration-300" id="collapse-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5"/>
                 </svg>
@@ -361,8 +374,12 @@
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/>
                             </svg>
-                            @php $trialCount = \App\Models\School::where('subscription_status', 'trial')->count(); @endphp
-                            @if($trialCount > 0)
+                            @php
+                                $trialCount = \App\Models\School::where('subscription_status', 'trial')->count();
+                                $pendingPayments = \App\Models\PaymentRequest::where('status', 'pending')->count();
+                                $notifCount = $trialCount + $pendingPayments;
+                            @endphp
+                            @if($notifCount > 0)
                             <span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white"></span>
                             @endif
                         </button>
@@ -371,10 +388,24 @@
                         <div id="notif-dropdown" class="notif-dropdown hidden">
                             <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
                                 <h3 class="text-sm font-bold text-slate-800">Notifications</h3>
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-50 text-brand-600">{{ $trialCount }} new</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-50 text-brand-600">{{ $notifCount }} new</span>
                             </div>
                             <div class="max-h-80 overflow-y-auto sidebar-scroll">
+                                @php $pendingPaymentRequests = \App\Models\PaymentRequest::with('school')->where('status', 'pending')->latest()->take(5)->get(); @endphp
                                 @php $trialSchools = \App\Models\School::where('subscription_status', 'trial')->latest()->take(5)->get(); @endphp
+                                @if($pendingPaymentRequests->count() > 0)
+                                    @foreach($pendingPaymentRequests as $req)
+                                    <a href="{{ route('admin.payment-requests.show', $req) }}" class="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition border-b border-gray-50 last:border-0">
+                                        <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+                                            <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <p class="text-[13px] font-semibold text-slate-700 truncate">{{ $req->school->name ?? 'Unknown' }}</p>
+                                            <p class="text-[11px] text-slate-400 mt-0.5">Payment request · {{ $req->formatted_amount }}</p>
+                                        </div>
+                                    </a>
+                                    @endforeach
+                                @endif
                                 @if($trialSchools->count() > 0)
                                     @foreach($trialSchools as $school)
                                     <a href="{{ route('admin.schools.show', $school) }}" class="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition border-b border-gray-50 last:border-0">
@@ -387,7 +418,8 @@
                                         </div>
                                     </a>
                                     @endforeach
-                                @else
+                                @endif
+                                @if($pendingPaymentRequests->isEmpty() && $trialSchools->isEmpty())
                                     <div class="px-4 py-10 text-center">
                                         <div class="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
                                             <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>

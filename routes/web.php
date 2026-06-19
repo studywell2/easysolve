@@ -26,6 +26,7 @@ use App\Http\Controllers\School\SchoolSettingController;
 use App\Http\Controllers\School\SubjectController;
 use App\Http\Controllers\School\TermsController;
 use App\Http\Controllers\School\UserController;
+use App\Http\Controllers\Admin\PaymentRequestController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -73,6 +74,10 @@ Route::middleware('auth')->group(function () {
         Route::get('dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::resource('schools', SchoolController::class);
         Route::resource('plans', AdminPlanController::class)->except(['show']);
+        Route::get('payment-requests', [PaymentRequestController::class, 'index'])->name('payment-requests.index');
+        Route::get('payment-requests/{paymentRequest}', [PaymentRequestController::class, 'show'])->name('payment-requests.show');
+        Route::post('payment-requests/{paymentRequest}/verify', [PaymentRequestController::class, 'verify'])->name('payment-requests.verify');
+        Route::post('payment-requests/{paymentRequest}/reject', [PaymentRequestController::class, 'reject'])->name('payment-requests.reject');
         Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
         Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
     });
@@ -85,6 +90,7 @@ Route::middleware('auth')->group(function () {
 
         // Billing (outside subscription & terms middleware so expired users can upgrade)
         Route::get('billing', [BillingController::class, 'index'])->name('billing.index');
+        Route::post('billing/payment-request', [BillingController::class, 'store'])->name('billing.store');
 
         // All routes below require active subscription AND T&C acceptance
         Route::middleware('subscription')->group(function () {

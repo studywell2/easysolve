@@ -61,14 +61,14 @@ class Plan extends Model
     public function getFormattedMonthlyAttribute(): string
     {
         return $this->price_monthly > 0
-            ? config('app.currency_symbol', '₦').number_format((float) $this->price_monthly)
+            ? config('platform.currency_symbol', '₦').number_format((float) $this->price_monthly)
             : 'Free';
     }
 
     public function getFormattedYearlyAttribute(): string
     {
         return $this->price_yearly > 0
-            ? config('app.currency_symbol', '₦').number_format((float) $this->price_yearly)
+            ? config('platform.currency_symbol', '₦').number_format((float) $this->price_yearly)
             : 'Free';
     }
 }
