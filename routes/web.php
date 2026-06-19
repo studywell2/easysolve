@@ -28,6 +28,7 @@ use App\Http\Controllers\School\TermsController;
 use App\Http\Controllers\School\TimetableController;
 use App\Http\Controllers\School\UserController;
 use App\Http\Controllers\Admin\PaymentRequestController;
+use App\Http\Controllers\School\StaffAttendanceController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -121,6 +122,11 @@ Route::middleware('auth')->group(function () {
                 // Attendance
                 Route::resource('attendance', AttendanceController::class)->only(['index', 'create', 'store']);
                 Route::get('attendance/students', [AttendanceController::class, 'getStudents'])->name('attendance.students');
+
+                // Staff Attendance (Clock In / Clock Out)
+                Route::get('staff-attendance', [StaffAttendanceController::class, 'index'])->name('staff-attendance.index');
+                Route::post('staff-attendance/clock-in', [StaffAttendanceController::class, 'clockIn'])->name('staff-attendance.clock-in');
+                Route::post('staff-attendance/clock-out', [StaffAttendanceController::class, 'clockOut'])->name('staff-attendance.clock-out');
 
                 // Grades
                 Route::resource('grades', GradeController::class)->except(['show']);

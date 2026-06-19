@@ -82,6 +82,18 @@ class User extends Authenticatable
         return $this->hasMany(Attendance::class, 'student_id');
     }
 
+    public function staffAttendances()
+    {
+        return $this->hasMany(StaffAttendance::class);
+    }
+
+    public function todayStaffAttendance()
+    {
+        return $this->hasOne(StaffAttendance::class)
+            ->where('date', today())
+            ->latest();
+    }
+
     public function grades()
     {
         return $this->hasMany(Grade::class, 'student_id');

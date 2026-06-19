@@ -279,6 +279,13 @@
                 <span class="sidebar-text">Attendance</span>
             </a>
 
+            <a href="{{ route('school.staff-attendance.index') }}" data-tooltip="Staff Attendance" data-nav-text="Staff Attendance" class="sidebar-link {{ request()->routeIs('school.staff-attendance.*') ? 'active' : 'text-slate-600' }}">
+                <svg class="sidebar-icon w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="sidebar-text">Staff Attendance</span>
+            </a>
+
             <a href="{{ route('school.timetable.index') }}" data-tooltip="Timetable" data-nav-text="Timetable" class="sidebar-link {{ request()->routeIs('school.timetable.*') ? 'active' : 'text-slate-600' }}">
                 <svg class="sidebar-icon w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0V11.25c0-1.243 1.007-2.25 2.25-2.25h13.5c1.243 0 2.25 1.007 2.25 2.25v7.5"/>
