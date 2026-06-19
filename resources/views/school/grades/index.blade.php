@@ -10,10 +10,16 @@
                 <p class="text-sm text-slate-500 mt-1">Manage student assessment scores and results</p>
             </div>
             @if(auth()->user()->canManageSchool())
-            <a href="{{ route('school.grades.create') }}" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-5 py-2.5 rounded-xl shadow-lg shadow-brand-600/20 transition inline-flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-                Add Grade
-            </a>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('school.grades.bulk') }}" class="bg-white hover:bg-gray-50 text-slate-700 border border-gray-200 font-semibold px-4 py-2.5 rounded-xl shadow-sm transition inline-flex items-center gap-2 text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"/></svg>
+                    Bulk Entry
+                </a>
+                <a href="{{ route('school.grades.create') }}" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-5 py-2.5 rounded-xl shadow-lg shadow-brand-600/20 transition inline-flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                    Add Grade
+                </a>
+            </div>
             @endif
         </div>
 

@@ -25,6 +25,7 @@ use App\Http\Controllers\School\SchoolClassController;
 use App\Http\Controllers\School\SchoolSettingController;
 use App\Http\Controllers\School\SubjectController;
 use App\Http\Controllers\School\TermsController;
+use App\Http\Controllers\School\TimetableController;
 use App\Http\Controllers\School\UserController;
 use App\Http\Controllers\Admin\PaymentRequestController;
 use Illuminate\Support\Facades\Route;
@@ -100,6 +101,9 @@ Route::middleware('auth')->group(function () {
 
                 // Users
                 Route::resource('users', UserController::class);
+                Route::get('users/import', [UserController::class, 'showImportForm'])->name('users.import');
+                Route::post('users/import', [UserController::class, 'import'])->name('users.import.store');
+                Route::get('users/import/template', [UserController::class, 'downloadTemplate'])->name('users.import.template');
 
                 // Classes
                 Route::resource('classes', SchoolClassController::class);
@@ -111,12 +115,17 @@ Route::middleware('auth')->group(function () {
                 Route::resource('sessions', AcademicSessionController::class)->except(['show']);
                 Route::post('terms/{term}/set-current', [AcademicSessionController::class, 'setCurrentTerm'])->name('terms.set-current');
 
+                // Timetable
+                Route::resource('timetable', TimetableController::class)->except(['show']);
+
                 // Attendance
                 Route::resource('attendance', AttendanceController::class)->only(['index', 'create', 'store']);
                 Route::get('attendance/students', [AttendanceController::class, 'getStudents'])->name('attendance.students');
 
                 // Grades
                 Route::resource('grades', GradeController::class)->except(['show']);
+                Route::get('grades/bulk-entry', [GradeController::class, 'bulkCreate'])->name('grades.bulk');
+                Route::post('grades/bulk-entry', [GradeController::class, 'bulkStore'])->name('grades.bulk.store');
 
                 // Fees
                 Route::resource('fees', FeeController::class)->except(['show']);
@@ -131,6 +140,9 @@ Route::middleware('auth')->group(function () {
 
                 // Reports
                 Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+                Route::get('reports/report-card', [ReportController::class, 'selectReportCard'])->name('reports.report-card');
+                Route::post('reports/report-card', [ReportController::class, 'generateReportCard'])->name('reports.report-card.generate');
+                Route::post('reports/class-report', [ReportController::class, 'classReport'])->name('reports.class-report');
 
                 // Announcements
                 Route::resource('announcements', AnnouncementController::class);

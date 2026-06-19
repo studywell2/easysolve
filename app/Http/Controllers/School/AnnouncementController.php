@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\School;
 
 use App\Http\Controllers\Controller;
+use App\Mail\AnnouncementNotificationMail;
 use App\Models\Announcement;
 use App\Models\SchoolClass;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 
 class AnnouncementController extends Controller
@@ -61,6 +64,12 @@ class AnnouncementController extends Controller
             'created_by' => auth()->id(),
         ]);
 
+        // Send email notifications to relevant users
+        $recipients = $this->getAnnouncementRecipients($validated, $schoolId);
+        foreach ($recipients as $recipient) {
+            Mail::to($recipient->email)->queue(new AnnouncementNotificationMail($announcement));
+        }
+
         return redirect()->route('school.announcements.index')->with('success', 'Announcement published successfully.');
     }
 
@@ -112,6 +121,31 @@ class AnnouncementController extends Controller
         $announcement->delete();
 
         return redirect()->route('school.announcements.index')->with('success', 'Announcement deleted successfully.');
+    }
+
+    // ─── Email Notification Helpers ───────────────────
+
+    private function getAnnouncementRecipients(array $validated, int $schoolId)
+    {
+        $query = User::where('school_id', $schoolId)->where('is_active', true);
+
+        switch ($validated['audience']) {
+            case 'parents':
+                $query->where('role', 'parent');
+                break;
+            case 'students':
+                $query->where('role', 'student');
+                break;
+            case 'class':
+                $query->where('role', 'student')->where('class_id', $validated['class_id']);
+                break;
+            case 'all':
+            default:
+                $query->whereIn('role', ['student', 'parent', 'teacher']);
+                break;
+        }
+
+        return $query->get();
     }
 
     private function authorizeAccess(Announcement $announcement): void

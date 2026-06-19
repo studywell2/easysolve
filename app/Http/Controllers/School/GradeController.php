@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\School;
 
 use App\Http\Controllers\Controller;
+use App\Mail\GradePublishedMail;
 use App\Models\Grade;
 use App\Models\SchoolClass;
 use App\Models\Subject;
 use App\Models\Term;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 
 class GradeController extends Controller
@@ -93,6 +96,9 @@ class GradeController extends Controller
             ]
         );
 
+        // Notify student's parent
+        $this->notifyGradePublished($validated['student_id'], $validated['subject_id'], $validated['term_id']);
+
         return redirect()->route('school.grades.index')->with('success', 'Grade recorded successfully.');
     }
 
@@ -139,6 +145,117 @@ class GradeController extends Controller
         $grade->delete();
 
         return redirect()->route('school.grades.index')->with('success', 'Grade deleted successfully.');
+    }
+
+    // ─── Bulk Grade Entry ─────────────────────────────
+
+    public function bulkCreate(Request $request)
+    {
+        $this->authorizeManager();
+        $schoolId = auth()->user()->school_id;
+        $classes = SchoolClass::where('school_id', $schoolId)->active()->get();
+        $subjects = Subject::where('school_id', $schoolId)->get();
+        $terms = Term::whereHas('academicSession', fn($q) => $q->where('school_id', $schoolId))->get();
+
+        $students = collect();
+        $existingGrades = collect();
+
+        if ($request->filled(['class_id', 'subject_id', 'term_id'])) {
+            $students = User::where('school_id', $schoolId)
+                ->where('role', 'student')
+                ->where('class_id', $request->class_id)
+                ->orderBy('last_name')
+                ->orderBy('first_name')
+                ->get();
+
+            $existingGrades = Grade::where('school_id', $schoolId)
+                ->where('class_id', $request->class_id)
+                ->where('subject_id', $request->subject_id)
+                ->where('term_id', $request->term_id)
+                ->get()
+                ->keyBy('student_id');
+        }
+
+        return view('school.grades.bulk', compact('classes', 'subjects', 'terms', 'students', 'existingGrades'));
+    }
+
+    public function bulkStore(Request $request)
+    {
+        $this->authorizeManager();
+        $schoolId = auth()->user()->school_id;
+
+        $validated = $request->validate([
+            'class_id' => ['required', Rule::exists('classes', 'id')->where('school_id', $schoolId)],
+            'subject_id' => ['required', Rule::exists('subjects', 'id')->where('school_id', $schoolId)],
+            'term_id' => ['required', Rule::exists('terms', 'id')->where(function ($q) use ($schoolId) {
+                $q->whereHas('academicSession', fn($sq) => $sq->where('school_id', $schoolId));
+            })],
+            'grades' => 'required|array',
+            'grades.*.student_id' => ['required', Rule::exists('users', 'id')->where('school_id', $schoolId)->where('role', 'student')],
+            'grades.*.ca_score' => 'nullable|numeric|min:0|max:40',
+            'grades.*.exam_score' => 'nullable|numeric|min:0|max:60',
+            'grades.*.remarks' => 'nullable|string|max:500',
+        ]);
+
+        $saved = 0;
+        foreach ($validated['grades'] as $row) {
+            // Skip rows where both scores are empty/null
+            if (empty($row['ca_score']) && empty($row['exam_score'])) {
+                continue;
+            }
+
+            $ca = (float) ($row['ca_score'] ?? 0);
+            $exam = (float) ($row['exam_score'] ?? 0);
+            $total = $ca + $exam;
+
+            Grade::updateOrCreate(
+                [
+                    'school_id' => $schoolId,
+                    'student_id' => $row['student_id'],
+                    'subject_id' => $validated['subject_id'],
+                    'term_id' => $validated['term_id'],
+                ],
+                [
+                    'class_id' => $validated['class_id'],
+                    'ca_score' => $ca,
+                    'exam_score' => $exam,
+                    'total_score' => $total,
+                    'grade' => Grade::calculateGrade($total),
+                    'remarks' => $row['remarks'] ?? null,
+                ]
+            );
+
+            // Notify student's parent
+            $this->notifyGradePublished($row['student_id'], $validated['subject_id'], $validated['term_id']);
+
+            $saved++;
+        }
+
+        return redirect()->route('school.grades.index')
+            ->with('success', "{$saved} grade(s) saved successfully.");
+    }
+
+    // ─── Email Notification Helper ────────────────────
+
+    private function notifyGradePublished(int $studentId, int $subjectId, int $termId): void
+    {
+        $grade = Grade::with(['student.parent', 'subject', 'term.academicSession'])
+            ->where('student_id', $studentId)
+            ->where('subject_id', $subjectId)
+            ->where('term_id', $termId)
+            ->first();
+
+        if (!$grade) return;
+
+        // Send to parent if exists
+        if ($grade->student?->parent?->email) {
+            Mail::to($grade->student->parent->email)->queue(new GradePublishedMail($grade, $grade->term));
+        }
+
+        // Also send to student if they have email
+        if ($grade->student?->email && $grade->student->email !== $grade->student?->parent?->email) {
+            Mail::to($grade->student->email)->queue(new GradePublishedMail($grade, $grade->term));
+        }
     }
 
     private function authorizeAccess(Grade $grade): void
