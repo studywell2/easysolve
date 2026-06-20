@@ -70,7 +70,9 @@ class GradeController extends Controller
             'class_id' => ['required', Rule::exists('classes', 'id')->where('school_id', $schoolId)],
             'subject_id' => ['required', Rule::exists('subjects', 'id')->where('school_id', $schoolId)],
             'term_id' => ['required', Rule::exists('terms', 'id')->where(function ($q) use ($schoolId) {
-                $q->whereHas('academicSession', fn($sq) => $sq->where('school_id', $schoolId));
+                $q->whereIn('academic_session_id', function ($sub) use ($schoolId) {
+                    $sub->select('id')->from('academic_sessions')->where('school_id', $schoolId);
+                });
             })],
             'ca_score' => 'required|numeric|min:0|max:40',
             'exam_score' => 'required|numeric|min:0|max:60',
@@ -188,7 +190,9 @@ class GradeController extends Controller
             'class_id' => ['required', Rule::exists('classes', 'id')->where('school_id', $schoolId)],
             'subject_id' => ['required', Rule::exists('subjects', 'id')->where('school_id', $schoolId)],
             'term_id' => ['required', Rule::exists('terms', 'id')->where(function ($q) use ($schoolId) {
-                $q->whereHas('academicSession', fn($sq) => $sq->where('school_id', $schoolId));
+                $q->whereIn('academic_session_id', function ($sub) use ($schoolId) {
+                    $sub->select('id')->from('academic_sessions')->where('school_id', $schoolId);
+                });
             })],
             'grades' => 'required|array',
             'grades.*.student_id' => ['required', Rule::exists('users', 'id')->where('school_id', $schoolId)->where('role', 'student')],

@@ -112,6 +112,21 @@ class School extends Model
         return $this->hasMany(BookIssue::class);
     }
 
+    public function homework()
+    {
+        return $this->hasMany(Homework::class);
+    }
+
+    public function events()
+    {
+        return $this->hasMany(SchoolEvent::class);
+    }
+
+    public function exams()
+    {
+        return $this->hasMany(Exam::class);
+    }
+
     public function activeSubscription()
     {
         return $this->hasOne(Subscription::class)

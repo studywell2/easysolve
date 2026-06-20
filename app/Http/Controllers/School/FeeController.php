@@ -71,7 +71,9 @@ class FeeController extends Controller
             'amount' => 'required|numeric|min:0',
             'class_id' => ['nullable', Rule::exists('classes', 'id')->where('school_id', $schoolId)],
             'term_id' => ['nullable', Rule::exists('terms', 'id')->where(function ($q) use ($schoolId) {
-                $q->whereHas('academicSession', fn($sq) => $sq->where('school_id', $schoolId));
+                $q->whereIn('academic_session_id', function ($sub) use ($schoolId) {
+                    $sub->select('id')->from('academic_sessions')->where('school_id', $schoolId);
+                });
             })],
             'description' => 'nullable|string|max:500',
             'status' => 'required|in:active,inactive',
@@ -104,7 +106,9 @@ class FeeController extends Controller
             'amount' => 'required|numeric|min:0',
             'class_id' => ['nullable', Rule::exists('classes', 'id')->where('school_id', $schoolId)],
             'term_id' => ['nullable', Rule::exists('terms', 'id')->where(function ($q) use ($schoolId) {
-                $q->whereHas('academicSession', fn($sq) => $sq->where('school_id', $schoolId));
+                $q->whereIn('academic_session_id', function ($sub) use ($schoolId) {
+                    $sub->select('id')->from('academic_sessions')->where('school_id', $schoolId);
+                });
             })],
             'description' => 'nullable|string|max:500',
             'status' => 'required|in:active,inactive',

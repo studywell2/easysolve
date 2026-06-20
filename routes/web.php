@@ -16,8 +16,11 @@ use App\Http\Controllers\School\AnnouncementController;
 use App\Http\Controllers\School\AttendanceController;
 use App\Http\Controllers\School\BillingController;
 use App\Http\Controllers\School\DashboardController as SchoolDashboardController;
+use App\Http\Controllers\School\EventController;
+use App\Http\Controllers\School\ExamController;
 use App\Http\Controllers\School\FeeController;
 use App\Http\Controllers\School\GradeController;
+use App\Http\Controllers\School\HomeworkController;
 use App\Http\Controllers\School\LibraryController;
 use App\Http\Controllers\School\MessageController;
 use App\Http\Controllers\School\PaymentController;
@@ -133,6 +136,20 @@ Route::middleware('auth')->group(function () {
                 Route::resource('grades', GradeController::class)->except(['show']);
                 Route::get('grades/bulk-entry', [GradeController::class, 'bulkCreate'])->name('grades.bulk');
                 Route::post('grades/bulk-entry', [GradeController::class, 'bulkStore'])->name('grades.bulk.store');
+
+                // Homework
+                Route::resource('homework', HomeworkController::class);
+                Route::post('homework/{homework}/submit', [HomeworkController::class, 'submit'])->name('homework.submit');
+                Route::post('homework/submissions/{submission}/grade', [HomeworkController::class, 'grade'])->name('homework.grade');
+
+                // Exams
+                Route::resource('exams', ExamController::class);
+                Route::post('exams/{exam}/schedules', [ExamController::class, 'storeSchedule'])->name('exams.schedules.store');
+                Route::delete('exams/{exam}/schedules/{schedule}', [ExamController::class, 'destroySchedule'])->name('exams.schedules.destroy');
+                Route::post('exams/{exam}/publish', [ExamController::class, 'publish'])->name('exams.publish');
+
+                // Events
+                Route::resource('events', EventController::class)->except(['show']);
 
                 // Library
                 Route::resource('library', LibraryController::class)->except(['show']);

@@ -132,6 +132,26 @@ class User extends Authenticatable
         return $this->hasMany(BookIssue::class);
     }
 
+    public function homework()
+    {
+        return $this->hasMany(Homework::class, 'teacher_id');
+    }
+
+    public function homeworkSubmissions()
+    {
+        return $this->hasMany(HomeworkSubmission::class, 'student_id');
+    }
+
+    public function events()
+    {
+        return $this->hasMany(SchoolEvent::class, 'created_by');
+    }
+
+    public function examSchedules()
+    {
+        return $this->hasMany(ExamSchedule::class, 'subject_id');
+    }
+
     // ─── Role Checks ──────────────────────────────────
 
     public function isSuperAdmin(): bool
