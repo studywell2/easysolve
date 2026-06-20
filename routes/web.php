@@ -18,6 +18,7 @@ use App\Http\Controllers\School\BillingController;
 use App\Http\Controllers\School\DashboardController as SchoolDashboardController;
 use App\Http\Controllers\School\FeeController;
 use App\Http\Controllers\School\GradeController;
+use App\Http\Controllers\School\LibraryController;
 use App\Http\Controllers\School\MessageController;
 use App\Http\Controllers\School\PaymentController;
 use App\Http\Controllers\School\ReportController;
@@ -132,6 +133,12 @@ Route::middleware('auth')->group(function () {
                 Route::resource('grades', GradeController::class)->except(['show']);
                 Route::get('grades/bulk-entry', [GradeController::class, 'bulkCreate'])->name('grades.bulk');
                 Route::post('grades/bulk-entry', [GradeController::class, 'bulkStore'])->name('grades.bulk.store');
+
+                // Library
+                Route::resource('library', LibraryController::class)->except(['show']);
+                Route::get('library/{library}/issue', [LibraryController::class, 'issueForm'])->name('library.issueForm');
+                Route::post('library/{library}/issue', [LibraryController::class, 'issue'])->name('library.issue');
+                Route::post('library/issue/{issue}/return', [LibraryController::class, 'returnBook'])->name('library.return');
 
                 // Fees
                 Route::resource('fees', FeeController::class)->except(['show']);

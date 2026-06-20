@@ -27,7 +27,7 @@
     <style>
         /* ====== Sidebar (Clean White Professional) ====== */
         .sidebar-link {
-            @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200 relative group/link text-slate-600;
+            @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-200 relative group/link text-slate-600;
         }
         .sidebar-link .sidebar-icon {
             @apply transition-all duration-200 text-slate-400;
@@ -39,15 +39,11 @@
             @apply text-slate-600;
         }
         .sidebar-link.active {
-            @apply text-brand-700 font-semibold;
-            background: #eff6ff;
-        }
-        .sidebar-link.active::before {
-            content: '';
-            @apply absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-7 rounded-r-full bg-brand-500;
+            @apply text-amber-700 font-semibold;
+            background: #FFFBEB;
         }
         .sidebar-link.active .sidebar-icon {
-            @apply text-brand-600;
+            @apply text-amber-600;
         }
 
         /* Tooltip for collapsed sidebar */
@@ -64,11 +60,7 @@
         }
 
         .sidebar-section {
-            @apply text-[10px] font-bold text-gray-400 uppercase tracking-[0.12em] px-3 mb-2 mt-6 first:mt-0 flex items-center gap-3 cursor-pointer select-none group/section;
-        }
-        .sidebar-section::after {
-            content: '';
-            @apply flex-1 h-px bg-gray-100;
+            @apply text-[10px] font-bold text-gray-400 uppercase tracking-[0.12em] px-3 mb-2 mt-6 first:mt-0 flex items-center cursor-pointer select-none group/section;
         }
         .sidebar-section:hover .section-chevron {
             @apply text-slate-500;

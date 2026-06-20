@@ -27,7 +27,7 @@
     <style>
         /* ====== Sidebar (Clean White Professional) ====== */
         .sidebar-link {
-            @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200 relative group/link text-slate-600;
+            @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-200 relative group/link text-slate-600;
         }
         .sidebar-link .sidebar-icon {
             @apply transition-all duration-200 text-slate-400;
@@ -39,15 +39,11 @@
             @apply text-slate-600;
         }
         .sidebar-link.active {
-            @apply text-brand-700 font-semibold;
-            background: #eff6ff;
-        }
-        .sidebar-link.active::before {
-            content: '';
-            @apply absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-7 rounded-r-full bg-brand-500;
+            @apply text-amber-700 font-semibold;
+            background: #FFFBEB;
         }
         .sidebar-link.active .sidebar-icon {
-            @apply text-brand-600;
+            @apply text-amber-600;
         }
 
         /* Tooltip for collapsed sidebar */
@@ -64,11 +60,7 @@
         }
 
         .sidebar-section {
-            @apply text-[10px] font-bold text-gray-400 uppercase tracking-[0.12em] px-3 mb-2 mt-6 first:mt-0 flex items-center gap-3 cursor-pointer select-none group/section;
-        }
-        .sidebar-section::after {
-            content: '';
-            @apply flex-1 h-px bg-gray-100;
+            @apply text-[10px] font-bold text-gray-400 uppercase tracking-[0.12em] px-3 mb-2 mt-6 first:mt-0 flex items-center cursor-pointer select-none group/section;
         }
         .sidebar-section:hover {
             @apply text-slate-500;
@@ -304,6 +296,14 @@
                 <span class="sidebar-text">Grades</span>
             </a>
 
+            <a href="{{ route('school.library.index') }}" data-tooltip="Library" data-nav-text="Library" class="sidebar-link {{ request()->routeIs('school.library.*') ? 'active' : 'text-slate-600' }}">
+                <svg class="sidebar-icon w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/>
+                </svg>
+                <span class="sidebar-text">Library</span>
+                <span class="sidebar-badge ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600">{{ auth()->user()->school?->libraryBooks()->count() ?? 0 }}</span>
+            </a>
+
             {{-- Communication --}}
             <div class="sidebar-section" data-section="communication" onclick="toggleSection(this)">Communication<svg class="w-3 h-3 text-gray-400 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg></div>
 
@@ -462,11 +462,18 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <div class="hidden md:block relative">
-                        <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
-                        </svg>
-                        <input type="text" id="topbar-search" placeholder="Search pages…" autocomplete="off" class="topbar-search w-56">
+                    <div class="hidden md:flex items-center gap-2">
+                        <div class="relative group">
+                            <svg class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand-500 transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+                            </svg>
+                            <input type="text" id="topbar-search" placeholder="Search pages…" autocomplete="off"
+                                class="w-64 pl-10 pr-16 py-2 bg-gray-50 border border-gray-200 rounded-xl text-[13px] text-slate-700 placeholder-slate-400 focus:bg-white focus:border-brand-400 focus:ring-2 focus:ring-brand-500/15 focus:shadow-sm outline-none transition-all duration-200">
+                            <kbd class="absolute right-2.5 top-1/2 -translate-y-1/2 hidden lg:flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-semibold text-slate-400 bg-white border border-gray-200 rounded-md group-focus-within:opacity-0 transition-opacity">
+                                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.5-7.5h15"/></svg>
+                                K
+                            </kbd>
+                        </div>
                     </div>
                     <div class="w-px h-8 bg-gray-200 hidden md:block mx-1"></div>
                     <span class="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-full {{ auth()->user()->isOwner() ? 'bg-gradient-to-r from-amber-50 to-orange-50 text-amber-700 border border-amber-100' : (auth()->user()->isAdmin() ? 'bg-gradient-to-r from-brand-50 to-indigo-50 text-brand-700 border border-brand-100' : 'bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 border border-emerald-100') }}">
@@ -689,6 +696,27 @@
             }
             if (e.key === 'Escape') {
                 clearSidebarSearch();
+            }
+        });
+
+        // ===== Keyboard shortcut: Cmd/Ctrl+K to focus search =====
+        document.addEventListener('keydown', function(e) {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                const topbarSearch = document.getElementById('topbar-search');
+                const sidebarSearch = document.getElementById('sidebar-search');
+                const target = window.innerWidth >= 768 ? topbarSearch : sidebarSearch;
+                if (target) {
+                    target.focus();
+                    target.select();
+                }
+            }
+            if (e.key === 'Escape') {
+                const topbarSearch = document.getElementById('topbar-search');
+                if (topbarSearch && document.activeElement === topbarSearch) {
+                    topbarSearch.value = '';
+                    topbarSearch.blur();
+                }
             }
         });
     </script>

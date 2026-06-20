@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\SchoolClass;
 use App\Models\Payment;
 use App\Models\Attendance;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -74,7 +75,62 @@ class DashboardController extends Controller
         $recentPayments = Payment::where('school_id', $school->id)
             ->with(['student', 'fee'])->latest()->take(5)->get();
 
-        return view('school.dashboard', compact('stats', 'recentUsers', 'recentPayments'));
+        // ===== Chart Data =====
+
+        // Monthly revenue (last 6 months)
+        $revenueMonths = [];
+        $revenueData = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $month = now()->subMonths($i);
+            $revenueMonths[] = $month->format('M');
+            $revenueData[] = (float) Payment::where('school_id', $school->id)
+                ->completed()
+                ->whereYear('paid_at', $month->year)
+                ->whereMonth('paid_at', $month->month)
+                ->sum('amount');
+        }
+
+        // Attendance breakdown
+        $attendanceBreakdown = [
+            'present' => Attendance::where('school_id', $school->id)->where('status', 'present')->count(),
+            'absent' => Attendance::where('school_id', $school->id)->where('status', 'absent')->count(),
+            'late' => Attendance::where('school_id', $school->id)->where('status', 'late')->count(),
+        ];
+
+        // User distribution
+        $userDistribution = [
+            'students' => $stats['students'],
+            'teachers' => $stats['teachers'],
+            'admins' => User::where('school_id', $school->id)->where('role', 'admin')->count()
+                + User::where('school_id', $school->id)->where('role', 'owner')->count(),
+        ];
+
+        // Enrollment trend (last 6 months)
+        $enrollmentMonths = [];
+        $enrollmentData = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $month = now()->subMonths($i);
+            $enrollmentMonths[] = $month->format('M');
+            $enrollmentData[] = User::where('school_id', $school->id)
+                ->whereYear('created_at', $month->year)
+                ->whereMonth('created_at', $month->month)
+                ->count();
+        }
+
+        $chartData = [
+            'revenue' => [
+                'labels' => $revenueMonths,
+                'data' => $revenueData,
+            ],
+            'attendance' => $attendanceBreakdown,
+            'users' => $userDistribution,
+            'enrollment' => [
+                'labels' => $enrollmentMonths,
+                'data' => $enrollmentData,
+            ],
+        ];
+
+        return view('school.dashboard', compact('stats', 'recentUsers', 'recentPayments', 'chartData'));
     }
 
     private function attendanceRate(int $schoolId): float

@@ -102,6 +102,16 @@ class School extends Model
         return $this->hasMany(PaymentRequest::class);
     }
 
+    public function libraryBooks()
+    {
+        return $this->hasMany(LibraryBook::class);
+    }
+
+    public function bookIssues()
+    {
+        return $this->hasMany(BookIssue::class);
+    }
+
     public function activeSubscription()
     {
         return $this->hasOne(Subscription::class)

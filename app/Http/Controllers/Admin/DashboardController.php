@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\PaymentRequest;
 use App\Models\School;
 use App\Models\User;
 
@@ -16,9 +17,10 @@ class DashboardController extends Controller
         $trialSchools = School::where('subscription_status', 'trial')->count();
         $recentSchools = School::with('owner')->withCount('users')->latest()->take(5)->get();
         $recentUsers = User::with('school')->latest()->take(8)->get();
+        $pendingPayments = PaymentRequest::where('status', 'pending')->count();
 
         return view('admin.dashboard', compact(
-            'totalSchools', 'totalUsers', 'activeSchools', 'trialSchools', 'recentSchools', 'recentUsers'
+            'totalSchools', 'totalUsers', 'activeSchools', 'trialSchools', 'recentSchools', 'recentUsers', 'pendingPayments'
         ));
     }
 }

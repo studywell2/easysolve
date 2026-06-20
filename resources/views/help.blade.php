@@ -28,9 +28,62 @@
         .animate-fade-up { animation: fadeUp 0.5s ease-out both; }
         .hero-gradient { background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 40%, #3b82f6 80%, #60a5fa 100%); }
         .grid-pattern { background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
+        .nav-blur { backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+        .mobile-menu { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+        .mobile-menu.open { max-height: 500px; }
     </style>
 </head>
 <body class="min-h-screen font-sans bg-gray-50">
+
+    <!-- ====== NAVBAR ====== -->
+    <nav id="navbar" class="sticky top-0 z-50 nav-blur bg-white/80 border-b border-gray-200/60 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="{{ route('home') }}" class="flex items-center gap-2.5">
+                <div class="w-9 h-9 bg-gradient-to-br from-brand-500 to-brand-600 rounded-xl flex items-center justify-center shadow-lg shadow-brand-500/25">
+                    <span class="text-white font-extrabold text-sm">ES</span>
+                </div>
+                <span class="text-lg font-extrabold tracking-tight text-slate-900">EASYSOLVE</span>
+            </a>
+            <div class="hidden md:flex items-center gap-8">
+                <a href="{{ route('home') }}#services" class="text-sm font-medium text-slate-600 hover:text-brand-600 transition">Features</a>
+                <a href="{{ route('home') }}#why-choose" class="text-sm font-medium text-slate-600 hover:text-brand-600 transition">Why Us</a>
+                <a href="{{ route('home') }}#built-for" class="text-sm font-medium text-slate-600 hover:text-brand-600 transition">Solutions</a>
+                <a href="{{ route('home') }}#faq" class="text-sm font-medium text-slate-600 hover:text-brand-600 transition">FAQ</a>
+                <a href="{{ route('plans.index') }}" class="text-sm font-medium text-slate-600 hover:text-brand-600 transition">Pricing</a>
+            </div>
+            <div class="flex items-center gap-3">
+                @auth
+                    <a href="{{ url('/dashboard') }}" class="hidden sm:inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-lg shadow-brand-600/20 transition">
+                        Dashboard
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="hidden sm:inline-block text-sm font-semibold text-slate-600 hover:text-brand-600 transition">Sign in</a>
+                    <a href="{{ route('register') }}" class="hidden sm:inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-lg shadow-brand-600/20 transition">
+                        Get started
+                    </a>
+                @endauth
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg text-slate-600 hover:bg-gray-100 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
+                </button>
+            </div>
+        </div>
+        <div id="mobile-menu" class="mobile-menu md:hidden bg-white border-t border-gray-100">
+            <div class="px-4 py-4 space-y-1">
+                <a href="{{ route('home') }}#services" class="block px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-gray-50 hover:text-brand-600 transition">Features</a>
+                <a href="{{ route('home') }}#why-choose" class="block px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-gray-50 hover:text-brand-600 transition">Why Us</a>
+                <a href="{{ route('home') }}#built-for" class="block px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-gray-50 hover:text-brand-600 transition">Solutions</a>
+                <a href="{{ route('plans.index') }}" class="block px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-gray-50 hover:text-brand-600 transition">Pricing</a>
+                <div class="pt-3 border-t border-gray-100 mt-3 flex flex-col gap-2">
+                    @auth
+                        <a href="{{ url('/dashboard') }}" class="text-center bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition">Dashboard</a>
+                    @else
+                        <a href="{{ route('login') }}" class="text-center border border-gray-200 text-slate-600 text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-gray-50 transition">Sign in</a>
+                        <a href="{{ route('register') }}" class="text-center bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition">Get started</a>
+                    @endauth
+                </div>
+            </div>
+        </div>
+    </nav>
 
     <!-- ====== HERO HEADER ====== -->
     <div class="relative hero-gradient overflow-hidden">
@@ -39,14 +92,6 @@
         <div class="absolute -bottom-40 -left-20 w-96 h-96 bg-indigo-400/15 rounded-full blur-3xl"></div>
 
         <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-            <!-- Logo -->
-            <a href="{{ route('home') }}" class="inline-flex items-center gap-2.5 mb-10 animate-fade-up">
-                <div class="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/20">
-                    <span class="text-white font-extrabold text-sm">ES</span>
-                </div>
-                <span class="text-xl font-extrabold tracking-tight text-white">EASYSOLVE</span>
-            </a>
-
             <div class="animate-fade-up" style="animation-delay: 0.1s;">
                 <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-xs font-semibold text-brand-100 mb-4">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/></svg>
@@ -156,30 +201,72 @@
     </div>
 
     <!-- ====== FOOTER ====== -->
-    <footer class="bg-slate-900 text-slate-400 py-8">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 bg-gradient-to-br from-brand-500 to-brand-600 rounded-lg flex items-center justify-center">
-                        <span class="text-white font-extrabold text-xs">ES</span>
+    <footer class="bg-slate-900 text-slate-400 pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mb-12">
+                <div class="col-span-2 md:col-span-3 lg:col-span-1">
+                    <div class="flex items-center gap-2.5 mb-4">
+                        <div class="w-9 h-9 bg-gradient-to-br from-brand-500 to-brand-600 rounded-xl flex items-center justify-center">
+                            <span class="text-white font-extrabold text-sm">ES</span>
+                        </div>
+                        <span class="text-xl font-extrabold text-white">EASYSOLVE</span>
                     </div>
-                    <span class="text-sm font-extrabold text-white">EASYSOLVE</span>
+                    <p class="text-sm leading-relaxed">The complete school management platform for modern schools.</p>
+                    <div class="flex items-center gap-3 mt-6">
+                        <a href="https://facebook.com/Studywell" target="_blank" rel="noopener noreferrer" class="w-9 h-9 bg-white/5 hover:bg-blue-600 rounded-lg flex items-center justify-center transition group" title="Facebook">
+                            <svg class="w-4 h-4 text-slate-400 group-hover:text-white transition" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>
+                        </a>
+                        <a href="https://linkedin.com/in/studywell" target="_blank" rel="noopener noreferrer" class="w-9 h-9 bg-white/5 hover:bg-blue-700 rounded-lg flex items-center justify-center transition group" title="LinkedIn">
+                            <svg class="w-4 h-4 text-slate-400 group-hover:text-white transition" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                        </a>
+                        <a href="https://wa.me/2349130710906" target="_blank" rel="noopener noreferrer" class="w-9 h-9 bg-white/5 hover:bg-green-600 rounded-lg flex items-center justify-center transition group" title="WhatsApp">
+                            <svg class="w-4 h-4 text-slate-400 group-hover:text-white transition" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.945C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.515 5.255l-.999 3.648 3.474-.837zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                        </a>
+                    </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <a href="https://facebook.com/Studywell" target="_blank" rel="noopener noreferrer" class="w-8 h-8 bg-white/5 hover:bg-blue-600 rounded-lg flex items-center justify-center transition group" title="Facebook">
-                        <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-white transition" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>
-                    </a>
-                    <a href="https://linkedin.com/in/studywell" target="_blank" rel="noopener noreferrer" class="w-8 h-8 bg-white/5 hover:bg-blue-700 rounded-lg flex items-center justify-center transition group" title="LinkedIn">
-                        <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-white transition" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                    </a>
-                    <a href="https://wa.me/2349130710906" target="_blank" rel="noopener noreferrer" class="w-8 h-8 bg-white/5 hover:bg-green-600 rounded-lg flex items-center justify-center transition group" title="WhatsApp">
-                        <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-white transition" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.945C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.515 5.255l-.999 3.648 3.474-.837zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-                    </a>
+                <div>
+                    <h4 class="text-white font-semibold text-sm mb-4">Platform</h4>
+                    <ul class="space-y-2.5 text-sm">
+                        <li><a href="{{ route('home') }}#services" class="hover:text-white transition">Features</a></li>
+                        <li><a href="{{ route('home') }}#why-choose" class="hover:text-white transition">Why Us</a></li>
+                        <li><a href="{{ route('plans.index') }}" class="hover:text-white transition">Pricing</a></li>
+                    </ul>
                 </div>
+                <div>
+                    <h4 class="text-white font-semibold text-sm mb-4">Resources</h4>
+                    <ul class="space-y-2.5 text-sm">
+                        <li><a href="{{ route('help') }}" class="hover:text-white transition">Help Center</a></li>
+                        <li><a href="{{ route('home') }}#faq" class="hover:text-white transition">FAQ</a></li>
+                        <li><a href="{{ route('terms') }}" class="hover:text-white transition">Terms</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold text-sm mb-4">Get Started</h4>
+                    <ul class="space-y-2.5 text-sm">
+                        <li><a href="{{ route('login') }}" class="hover:text-white transition">Sign In</a></li>
+                        <li><a href="{{ route('register') }}" class="hover:text-white transition">Create Account</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <p class="text-xs text-slate-500">&copy; {{ date('Y') }} EASYSOLVE. All rights reserved.</p>
+                <p class="text-xs text-slate-500 flex items-center gap-1.5">Built by <span class="font-semibold text-brand-400">WETech Technology</span></p>
             </div>
         </div>
     </footer>
 
+    <script>
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('open');
+        }
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 10) {
+                navbar.classList.add('shadow-md');
+            } else {
+                navbar.classList.remove('shadow-md');
+            }
+        });
+    </script>
 </body>
 </html>
