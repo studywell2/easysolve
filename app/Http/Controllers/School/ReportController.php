@@ -56,18 +56,27 @@ class ReportController extends Controller
 
     public function selectReportCard(Request $request)
     {
-        $this->authorizeManager();
-        $schoolId = auth()->user()->school_id;
-        $classes = SchoolClass::where('school_id', $schoolId)->active()->with('students')->get();
+        $user = auth()->user();
+        $schoolId = $user->school_id;
+
         $terms = Term::whereHas('academicSession', fn($q) => $q->where('school_id', $schoolId))->get();
 
-        return view('school.reports.report-card-select', compact('classes', 'terms'));
+        if ($user->isParent()) {
+            $children = $user->children()->with(['schoolClass', 'section'])->get();
+            $isManager = false;
+            return view('school.reports.report-card-select', compact('children', 'terms', 'isManager'));
+        }
+
+        $this->authorizeManager();
+        $classes = SchoolClass::where('school_id', $schoolId)->active()->with('students')->get();
+        $isManager = true;
+        return view('school.reports.report-card-select', compact('classes', 'terms', 'isManager'));
     }
 
     public function generateReportCard(Request $request)
     {
-        $this->authorizeManager();
-        $schoolId = auth()->user()->school_id;
+        $user = auth()->user();
+        $schoolId = $user->school_id;
 
         $validated = $request->validate([
             'student_id' => 'required|exists:users,id',
@@ -78,6 +87,15 @@ class ReportController extends Controller
             ->where('role', 'student')
             ->with(['schoolClass', 'section', 'school'])
             ->findOrFail($validated['student_id']);
+
+        // Parents can only download report cards for their own children
+        if ($user->isParent()) {
+            if (!$user->children()->where('id', $student->id)->exists()) {
+                abort(403, 'You can only download report cards for your own children.');
+            }
+        } elseif (!$user->canManageSchool()) {
+            abort(403, 'You do not have permission to perform this action.');
+        }
 
         $term = Term::with('academicSession')->findOrFail($validated['term_id']);
 

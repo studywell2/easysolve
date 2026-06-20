@@ -49,7 +49,7 @@
 
         {{-- Summary Stats --}}
         @if($summary)
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center mb-3 shadow-lg shadow-emerald-500/20">
                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -85,7 +85,7 @@
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6">
             <form method="GET" class="flex flex-wrap gap-3">
                 @if(auth()->user()->canManageSchool())
-                <select name="class_id" class="px-4 py-2.5 bg-gray-50/80 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/10 transition">
+                <select name="class_id" class="flex-1 min-w-[140px] px-4 py-2.5 bg-gray-50/80 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/10 transition">
                     <option value="">All Classes</option>
                     @foreach($classes as $c)
                     <option value="{{ $c->id }}" {{ request('class_id') == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
@@ -93,9 +93,9 @@
                 </select>
                 @endif
 
-                <input type="date" name="date" value="{{ request('date') }}" class="px-4 py-2.5 bg-gray-50/80 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/10 transition">
+                <input type="date" name="date" value="{{ request('date') }}" class="flex-1 min-w-[140px] px-4 py-2.5 bg-gray-50/80 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/10 transition">
 
-                <select name="status" class="px-4 py-2.5 bg-gray-50/80 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/10 transition">
+                <select name="status" class="flex-1 min-w-[140px] px-4 py-2.5 bg-gray-50/80 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/10 transition">
                     <option value="">All Statuses</option>
                     <option value="present" {{ request('status') == 'present' ? 'selected' : '' }}>Present</option>
                     <option value="absent" {{ request('status') == 'absent' ? 'selected' : '' }}>Absent</option>

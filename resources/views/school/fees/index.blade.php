@@ -7,17 +7,20 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div>
                 <h1 class="text-2xl font-bold text-slate-900">Fees</h1>
-                <p class="text-sm text-slate-500 mt-1">Manage fee structures for classes and terms</p>
+                <p class="text-sm text-slate-500 mt-1">{{ $isManager ? 'Manage fee structures for classes and terms' : 'Fee structures and payment status' }}</p>
             </div>
+            @if($isManager)
             <a href="{{ route('school.fees.create') }}" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-5 py-2.5 rounded-xl shadow-lg shadow-brand-600/20 transition inline-flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                 Add Fee
             </a>
+            @endif
         </div>
 
+        @if($isManager)
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6">
             <form method="GET" class="flex flex-wrap gap-3">
-                <select name="status" class="px-4 py-2.5 bg-gray-50/80 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/10 transition">
+                <select name="status" class="flex-1 min-w-[140px] px-4 py-2.5 bg-gray-50/80 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/10 transition">
                     <option value="">All Statuses</option>
                     <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
                     <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
@@ -28,6 +31,7 @@
                 </button>
             </form>
         </div>
+        @endif
 
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
@@ -39,7 +43,11 @@
                             <th class="text-left py-3 px-4 font-semibold text-slate-500 uppercase tracking-wider text-xs">Class</th>
                             <th class="text-left py-3 px-4 font-semibold text-slate-500 uppercase tracking-wider text-xs">Term</th>
                             <th class="text-left py-3 px-4 font-semibold text-slate-500 uppercase tracking-wider text-xs">Status</th>
+                            @if(!$isManager)
+                            <th class="text-left py-3 px-4 font-semibold text-slate-500 uppercase tracking-wider text-xs">Payment Status</th>
+                            @else
                             <th class="text-left py-3 px-4 font-semibold text-slate-500 uppercase tracking-wider text-xs">Actions</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">
@@ -55,6 +63,7 @@
                                     {{ ucfirst($f->status) }}
                                 </span>
                             </td>
+                            @if($isManager)
                             <td class="py-3 px-4">
                                 <div class="flex items-center gap-1">
                                     <a href="{{ route('school.fees.edit', $f) }}" class="p-2 rounded-lg text-slate-400 hover:text-brand-600 hover:bg-brand-50 transition" title="Edit">
@@ -68,16 +77,46 @@
                                     </form>
                                 </div>
                             </td>
+                            @else
+                            {{-- Parent: show payment status per child --}}
+                            <td class="py-3 px-4">
+                                @php $paymentMap = $childPaymentMap[$f->id] ?? []; @endphp
+                                @foreach(auth()->user()->children as $child)
+                                    @php $payment = $paymentMap[$child->id] ?? null; @endphp
+                                    <div class="flex items-center gap-2 mb-1 last:mb-0">
+                                        <span class="text-xs text-slate-500 truncate max-w-[100px]">{{ $child->first_name }}</span>
+                                        @if($payment)
+                                            @if($payment->balance > 0)
+                                                <span class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                                    Partial (₦{{ number_format($payment->balance) }} left)
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                                    Paid
+                                                </span>
+                                            @endif
+                                        @else
+                                            <span class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                                                Outstanding
+                                            </span>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </td>
+                            @endif
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="py-12 text-center">
+                            <td colspan="{{ $isManager ? 6 : 6 }}" class="py-12 text-center">
                                 <div class="flex flex-col items-center justify-center">
                                     <div class="bg-gray-100 rounded-2xl p-4 mb-3">
                                         <svg class="w-16 h-16 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25"/></svg>
                                     </div>
-                                    <p class="text-sm font-semibold text-slate-400">No fees found</p>
-                                    <p class="text-xs text-slate-400 mt-1">Get started by adding a new fee structure.</p>
+                                    <p class="text-sm font-semibold text-slate-400">{{ $isManager ? 'No fees found' : 'No fees applicable to your children yet' }}</p>
+                                    <p class="text-xs text-slate-400 mt-1">{{ $isManager ? 'Get started by adding a new fee structure.' : 'Fees will appear here once the school sets them up.' }}</p>
                                 </div>
                             </td>
                         </tr>

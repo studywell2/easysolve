@@ -165,6 +165,10 @@
                 <span class="text-[15px] font-bold text-slate-800 tracking-tight">EASYSOLVE</span>
                 <span class="block text-[9px] font-semibold text-brand-600 -mt-0.5 tracking-[0.15em] uppercase">Platform Admin</span>
             </div>
+            <!-- Mobile close button -->
+            <button onclick="toggleMobileSidebar()" class="lg:hidden ml-auto w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-700 hover:bg-gray-100 transition" aria-label="Close sidebar">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
         </div>
 
         <!-- Sidebar Search -->

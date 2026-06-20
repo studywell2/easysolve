@@ -188,6 +188,10 @@
                     </span>
                 @endif
             </div>
+            <!-- Mobile close button -->
+            <button onclick="toggleMobileSidebar()" class="lg:hidden ml-auto w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-700 hover:bg-gray-100 transition" aria-label="Close sidebar">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
         </div>
 
         <!-- Current Term Banner -->
@@ -498,9 +502,9 @@
         </main>
 
         <footer class="border-t border-gray-200/60 bg-white/50 px-6 py-4">
-            <div class="flex items-center justify-between text-xs text-slate-400">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-slate-400 text-center sm:text-left">
                 <span>&copy; {{ date('Y') }} {{ auth()->user()->school?->name ?? 'EASYSOLVE' }}</span>
-                <span class="flex items-center gap-1.5">Built by <span class="font-semibold text-brand-600">WETech Technology</span></span>
+                <span class="flex items-center gap-1.5 justify-center">Built by <span class="font-semibold text-brand-600">WETech Technology</span></span>
             </div>
         </footer>
     </div>
@@ -690,16 +694,21 @@
     </script>
 
     @else
-    <!-- ========== STUDENT / PARENT LAYOUT (Top Nav) ========== -->
-    <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-200/60">
+    <!-- ========== STUDENT / PARENT LAYOUT (Top Nav + Hamburger) ========== -->
+
+    <!-- Mobile menu overlay -->
+    <div id="mobile-menu-overlay" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300" onclick="toggleMobileMenu()"></div>
+
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200/60">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-                <div class="flex items-center gap-8">
-                    <a href="{{ route('school.dashboard') }}" class="flex items-center gap-2.5">
-                        <div class="w-9 h-9 bg-gradient-to-br from-brand-500 to-brand-600 rounded-xl flex items-center justify-center shadow-lg shadow-brand-500/20">
+                <!-- Left: Logo + Desktop Nav -->
+                <div class="flex items-center gap-4 md:gap-8 min-w-0">
+                    <a href="{{ route('school.dashboard') }}" class="flex items-center gap-2.5 flex-shrink-0">
+                        <div class="w-9 h-9 bg-gradient-to-br from-brand-500 to-brand-600 rounded-xl flex items-center justify-center shadow-lg shadow-brand-500/20 flex-shrink-0">
                             <span class="text-white font-extrabold text-sm">ES</span>
                         </div>
-                        <span class="text-lg font-bold text-slate-800">{{ auth()->user()->school?->short_name ?? 'EASYSOLVE' }}</span>
+                        <span class="text-base sm:text-lg font-bold text-slate-800 truncate">{{ auth()->user()->school?->short_name ?? 'EASYSOLVE' }}</span>
                     </a>
                     <nav class="hidden md:flex items-center gap-6">
                         @if(auth()->user()->isStudent())
@@ -711,25 +720,41 @@
                             <a href="{{ route('school.messages.index') }}" class="nav-link {{ request()->routeIs('school.messages.*') ? 'active' : '' }}">Messages</a>
                         @elseif(auth()->user()->isParent())
                             <a href="{{ route('school.dashboard') }}" class="nav-link {{ request()->routeIs('school.dashboard') ? 'active' : '' }}">Home</a>
+                            <a href="{{ route('school.attendance.index') }}" class="nav-link {{ request()->routeIs('school.attendance.*') ? 'active' : '' }}">Attendance</a>
                             <a href="{{ route('school.grades.index') }}" class="nav-link {{ request()->routeIs('school.grades.*') ? 'active' : '' }}">Grades</a>
+                            <a href="{{ route('school.fees.index') }}" class="nav-link {{ request()->routeIs('school.fees.*') ? 'active' : '' }}">Fees</a>
                             <a href="{{ route('school.payments.index') }}" class="nav-link {{ request()->routeIs('school.payments.*') ? 'active' : '' }}">Payments</a>
+                            <a href="{{ route('school.reports.report-card') }}" class="nav-link {{ request()->routeIs('school.reports.*') ? 'active' : '' }}">Report Card</a>
                             <a href="{{ route('school.announcements.index') }}" class="nav-link {{ request()->routeIs('school.announcements.*') ? 'active' : '' }}">Announcements</a>
                             <a href="{{ route('school.messages.index') }}" class="nav-link {{ request()->routeIs('school.messages.*') ? 'active' : '' }}">Messages</a>
                         @endif
                     </nav>
                 </div>
-                <div class="flex items-center gap-3">
+
+                <!-- Right: Controls -->
+                <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                     <span class="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-full bg-gradient-to-r from-brand-50 to-indigo-50 text-brand-700 border border-brand-100">
                         <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
                         {{ ucfirst(auth()->user()->role) }}
                     </span>
                     <div class="relative">
-                        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shadow-lg shadow-brand-500/20">
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center text-white font-bold text-[10px] sm:text-xs shadow-lg shadow-brand-500/20">
                             {{ auth()->user()->initials }}
                         </div>
                         <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-white"></div>
                     </div>
-                    <form method="POST" action="{{ route('logout') }}">
+
+                    {{-- Hamburger button (mobile only) --}}
+                    <button type="button" onclick="toggleMobileMenu()" class="md:hidden relative w-10 h-10 flex items-center justify-center rounded-xl text-slate-600 hover:bg-gray-100 transition" aria-label="Toggle menu" id="hamburger-btn">
+                        <svg class="w-5 h-5 hamburger-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+                        </svg>
+                        <svg class="w-5 h-5 close-icon hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+
+                    <form method="POST" action="{{ route('logout') }}" class="hidden sm:block">
                         @csrf
                         <button type="submit" class="text-gray-400 hover:text-red-500 transition p-1.5 rounded-lg hover:bg-red-50" title="Sign out">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -740,21 +765,81 @@
                 </div>
             </div>
         </div>
-        <div class="md:hidden border-t border-gray-100 px-4 py-2 flex items-center gap-4 overflow-x-auto">
-            @if(auth()->user()->isStudent())
-                <a href="{{ route('school.dashboard') }}" class="nav-link whitespace-nowrap {{ request()->routeIs('school.dashboard') ? 'active' : '' }}">Home</a>
-                <a href="{{ route('school.attendance.index') }}" class="nav-link whitespace-nowrap {{ request()->routeIs('school.attendance.*') ? 'active' : '' }}">Attendance</a>
-                <a href="{{ route('school.grades.index') }}" class="nav-link whitespace-nowrap {{ request()->routeIs('school.grades.*') ? 'active' : '' }}">Grades</a>
-                <a href="{{ route('school.payments.index') }}" class="nav-link whitespace-nowrap {{ request()->routeIs('school.payments.*') ? 'active' : '' }}">Payments</a>
-                <a href="{{ route('school.announcements.index') }}" class="nav-link whitespace-nowrap {{ request()->routeIs('school.announcements.*') ? 'active' : '' }}">Announcements</a>
-                <a href="{{ route('school.messages.index') }}" class="nav-link whitespace-nowrap {{ request()->routeIs('school.messages.*') ? 'active' : '' }}">Messages</a>
-            @elseif(auth()->user()->isParent())
-                <a href="{{ route('school.dashboard') }}" class="nav-link whitespace-nowrap {{ request()->routeIs('school.dashboard') ? 'active' : '' }}">Home</a>
-                <a href="{{ route('school.grades.index') }}" class="nav-link whitespace-nowrap {{ request()->routeIs('school.grades.*') ? 'active' : '' }}">Grades</a>
-                <a href="{{ route('school.payments.index') }}" class="nav-link whitespace-nowrap {{ request()->routeIs('school.payments.*') ? 'active' : '' }}">Payments</a>
-                <a href="{{ route('school.announcements.index') }}" class="nav-link whitespace-nowrap {{ request()->routeIs('school.announcements.*') ? 'active' : '' }}">Announcements</a>
-                <a href="{{ route('school.messages.index') }}" class="nav-link whitespace-nowrap {{ request()->routeIs('school.messages.*') ? 'active' : '' }}">Messages</a>
-            @endif
+
+        {{-- Mobile slide-down menu --}}
+        <div id="mobile-menu" class="md:hidden overflow-hidden max-h-0 transition-all duration-300 ease-in-out bg-white border-t border-gray-100">
+            {{-- User Info Header --}}
+            <div class="px-4 py-4 border-b border-gray-50 flex items-center gap-3">
+                <div class="relative flex-shrink-0">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shadow-lg">
+                        {{ auth()->user()->initials }}
+                    </div>
+                    <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-white"></div>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <p class="text-sm font-semibold text-slate-800 truncate">{{ auth()->user()->full_name }}</p>
+                    <p class="text-xs text-slate-400 truncate">{{ auth()->user()->email }}</p>
+                </div>
+                <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-50 text-brand-600">
+                    {{ ucfirst(auth()->user()->role) }}
+                </span>
+            </div>
+
+            {{-- Nav Links --}}
+            <nav class="px-3 py-3 space-y-0.5">
+                @php
+                    $mobileNavItems = [
+                        ['route' => 'school.dashboard', 'active' => 'school.dashboard', 'label' => 'Home', 'icon' => 'M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.5a.75.75 0 01.75.75h4.5a.75.75 0 01.75-.75V15a.75.75 0 01.75-.75h3a.75.75 0 01.75.75v4.5a.75.75 0 00.75.75h4.5a.75.75 0 00.75-.75V9.75M8.25 3h7.5'],
+                    ];
+                    if (auth()->user()->isStudent()) {
+                        $mobileNavItems = array_merge($mobileNavItems, [
+                            ['route' => 'school.attendance.index', 'active' => 'school.attendance.*', 'label' => 'Attendance', 'icon' => 'M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z'],
+                            ['route' => 'school.grades.index', 'active' => 'school.grades.*', 'label' => 'Grades', 'icon' => 'M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z'],
+                            ['route' => 'school.payments.index', 'active' => 'school.payments.*', 'label' => 'Payments', 'icon' => 'M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z'],
+                            ['route' => 'school.announcements.index', 'active' => 'school.announcements.*', 'label' => 'Announcements', 'icon' => 'M10.34 15.84a3 3 0 11-5.66 0M9 17.25h6m-3-12.75a7.5 7.5 0 100 15 7.5 7.5 0 000-15z'],
+                            ['route' => 'school.messages.index', 'active' => 'school.messages.*', 'label' => 'Messages', 'icon' => 'M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.294 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v.51z'],
+                        ]);
+                    } elseif (auth()->user()->isParent()) {
+                        $mobileNavItems = array_merge($mobileNavItems, [
+                            ['route' => 'school.attendance.index', 'active' => 'school.attendance.*', 'label' => 'Attendance', 'icon' => 'M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z'],
+                            ['route' => 'school.grades.index', 'active' => 'school.grades.*', 'label' => 'Grades', 'icon' => 'M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z'],
+                            ['route' => 'school.fees.index', 'active' => 'school.fees.*', 'label' => 'Fees', 'icon' => 'M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z'],
+                            ['route' => 'school.payments.index', 'active' => 'school.payments.*', 'label' => 'Payments', 'icon' => 'M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z'],
+                            ['route' => 'school.reports.report-card', 'active' => 'school.reports.*', 'label' => 'Report Card', 'icon' => 'M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z'],
+                            ['route' => 'school.announcements.index', 'active' => 'school.announcements.*', 'label' => 'Announcements', 'icon' => 'M10.34 15.84a3 3 0 11-5.66 0M9 17.25h6m-3-12.75a7.5 7.5 0 100 15 7.5 7.5 0 000-15z'],
+                            ['route' => 'school.messages.index', 'active' => 'school.messages.*', 'label' => 'Messages', 'icon' => 'M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.294 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v.51z'],
+                        ]);
+                    }
+                @endphp
+
+                @foreach($mobileNavItems as $item)
+                    @php
+                        $isActive = request()->routeIs($item['active']);
+                    @endphp
+                    <a href="{{ route($item['route']) }}" onclick="toggleMobileMenu()" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition {{ $isActive ? 'bg-brand-50 text-brand-700 font-semibold' : 'text-slate-600 hover:bg-gray-50' }}">
+                        <svg class="w-5 h-5 flex-shrink-0 {{ $isActive ? 'text-brand-600' : 'text-slate-400' }}" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $item['icon'] }}"/>
+                        </svg>
+                        <span>{{ $item['label'] }}</span>
+                        @if($isActive)
+                        <span class="ml-auto w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                        @endif
+                    </a>
+                @endforeach
+            </nav>
+
+            {{-- Logout --}}
+            <div class="px-3 py-3 border-t border-gray-50">
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/>
+                        </svg>
+                        <span>Sign Out</span>
+                    </button>
+                </form>
+            </div>
         </div>
     </header>
 
@@ -772,11 +857,57 @@
     </main>
 
     <footer class="border-t border-gray-200/60 bg-white/50 px-6 py-4 mt-auto">
-        <div class="max-w-7xl mx-auto flex items-center justify-between text-xs text-slate-400">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-slate-400 text-center sm:text-left">
             <span>&copy; {{ date('Y') }} {{ auth()->user()->school?->name ?? 'EASYSOLVE' }}</span>
-            <span class="flex items-center gap-1.5">Built by <span class="font-semibold text-brand-600">WETech Technology</span></span>
+            <span class="flex items-center gap-1.5 justify-center">Built by <span class="font-semibold text-brand-600">WETech Technology</span></span>
         </div>
     </footer>
+    @endif
+
+    {{-- Mobile menu toggle for student/parent layout --}}
+    @if(!$isSchoolManager)
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const overlay = document.getElementById('mobile-menu-overlay');
+            const hamburger = document.querySelector('.hamburger-icon');
+            const closeIcon = document.querySelector('.close-icon');
+            const body = document.body;
+
+            const isOpen = menu.style.maxHeight && menu.style.maxHeight !== '0px';
+
+            if (isOpen) {
+                // Close
+                menu.style.maxHeight = '0px';
+                overlay.classList.add('hidden');
+                hamburger.classList.remove('hidden');
+                closeIcon.classList.add('hidden');
+                body.style.overflow = '';
+            } else {
+                // Open
+                menu.style.maxHeight = menu.scrollHeight + 'px';
+                overlay.classList.remove('hidden');
+                hamburger.classList.add('hidden');
+                closeIcon.classList.remove('hidden');
+                body.style.overflow = 'hidden';
+            }
+        }
+
+        // Close menu on resize to desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 768) {
+                const menu = document.getElementById('mobile-menu');
+                const overlay = document.getElementById('mobile-menu-overlay');
+                if (menu) menu.style.maxHeight = '0px';
+                if (overlay) overlay.classList.add('hidden');
+                const hamburger = document.querySelector('.hamburger-icon');
+                const closeIcon = document.querySelector('.close-icon');
+                if (hamburger) hamburger.classList.remove('hidden');
+                if (closeIcon) closeIcon.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        });
+    </script>
     @endif
 
     @stack('scripts')

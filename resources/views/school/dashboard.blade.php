@@ -211,7 +211,7 @@
     <!-- My Children Section -->
     <div class="mb-8 animate-fade-up delay-1">
         <h2 class="text-lg font-bold text-slate-800 mb-4">My Children</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
             @foreach($children as $child)
             <div class="relative overflow-hidden bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-500 to-indigo-400"></div>
@@ -285,7 +285,7 @@
                 </div>
                 <a href="{{ route('school.attendance.index') }}" class="text-xs font-semibold text-brand-600 hover:text-brand-700 transition">View All →</a>
             </div>
-            <div class="grid grid-cols-4 gap-4">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                 <div class="text-center">
                     <p class="text-2xl font-extrabold {{ $attendanceStats['rate'] >= 75 ? 'text-emerald-600' : ($attendanceStats['rate'] >= 50 ? 'text-amber-600' : 'text-red-600') }}">{{ $attendanceStats['rate'] }}%</p>
                     <p class="text-[10px] text-slate-400 mt-0.5">Rate</p>
@@ -317,7 +317,7 @@
     @endif
 
     {{-- Parent: show attendance rate per child in children cards --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
         @if(auth()->user()->isStudent())
         <a href="{{ route('school.attendance.index') }}" class="group animate-fade-up delay-1 relative overflow-hidden bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-violet-400"></div>

@@ -13,8 +13,17 @@ class FeeController extends Controller
 {
     public function index(Request $request)
     {
-        $schoolId = auth()->user()->school_id;
+        $user = auth()->user();
+        $schoolId = $user->school_id;
         $query = Fee::where('school_id', $schoolId)->with(['schoolClass', 'term']);
+
+        // Parents only see fees applicable to their children
+        if ($user->isParent()) {
+            $childClassIds = $user->children()->whereNotNull('class_id')->pluck('class_id');
+            $query->where(function ($q) use ($childClassIds) {
+                $q->whereNull('class_id')->orWhereIn('class_id', $childClassIds);
+            });
+        }
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -22,7 +31,24 @@ class FeeController extends Controller
 
         $fees = $query->latest()->paginate(15)->appends($request->query());
 
-        return view('school.fees.index', compact('fees'));
+        // For parents, load payment status per fee per child
+        $childPaymentMap = [];
+        if ($user->isParent()) {
+            $children = $user->children()->get();
+            foreach ($fees as $fee) {
+                foreach ($children as $child) {
+                    $payment = \App\Models\Payment::where('fee_id', $fee->id)
+                        ->where('student_id', $child->id)
+                        ->where('status', 'completed')
+                        ->first();
+                    $childPaymentMap[$fee->id][$child->id] = $payment;
+                }
+            }
+        }
+
+        $isManager = $user->canManageSchool();
+
+        return view('school.fees.index', compact('fees', 'isManager', 'childPaymentMap'));
     }
 
     public function create()
