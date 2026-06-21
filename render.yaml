@@ -1,0 +1,85 @@
+# Render Blueprint — EASYSOLVE Cloud Deployment (Free Tier)
+# Docs: https://render.com/docs/blueprint-spec
+# Usage: Push this to GitHub, then go to render.com → New → Blueprint
+
+databases:
+  - name: easysolve-db
+    plan: free
+    databaseName: easysolve
+    ipAllowList: []  # Allow all connections (safe for demo)
+
+services:
+  - type: web
+    name: easysolve
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /up
+    autoDeploy: true
+    envVars:
+      # ── App config ───────────────────────────────────────
+      - key: APP_NAME
+        value: EASYSOLVE
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        sync: false  # Generated at runtime by Dockerfile CMD
+      - key: APP_URL
+        value: https://easysolve.onrender.com  # ← Change after deploy to your URL
+
+      # ── Database (auto-linked to the DB above) ───────────
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase:
+          name: easysolve-db
+          property: host
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_DATABASE
+        value: easysolve
+      - key: DB_USERNAME
+        fromDatabase:
+          name: easysolve-db
+          property: username
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: easysolve-db
+          property: password
+
+      # ── Sessions, cache, queue (database driver) ─────────
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: FILESYSTEM_DISK
+        value: local
+
+      # ── Mail (log for demo — no real email sent) ─────────
+      - key: MAIL_MAILER
+        value: log
+
+      # ── Super Admin password (for first login) ──────────
+      - key: SUPER_ADMIN_PASSWORD
+        value: Ea$ySolve@2026!Adm
+
+      # ── Platform bank details (shown on billing page) ─────
+      - key: PLATFORM_BANK_NAME
+        value: "Guaranty Trust Bank (GTBank)"
+      - key: PLATFORM_BANK_ACCOUNT_NAME
+        value: "EASYSOLVE Technologies"
+      - key: PLATFORM_BANK_ACCOUNT_NUMBER
+        value: "0123456789"
+      - key: PLATFORM_BANK_SORT_CODE
+        value: ""
+      - key: PLATFORM_BANK_TRANSFER_NOTE
+        value: "Use your school name as the transfer reference."
+
+      # ── Currency ─────────────────────────────────────────
+      - key: APP_CURRENCY_SYMBOL
+        value: "₦"
