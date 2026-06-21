@@ -72,11 +72,11 @@ services:
 
       # ── Platform bank details (shown on billing page) ─────
       - key: PLATFORM_BANK_NAME
-        value: "Guaranty Trust Bank (GTBank)"
+        value: "Sterling Bank"
       - key: PLATFORM_BANK_ACCOUNT_NAME
-        value: "EASYSOLVE Technologies"
+        value: "Akingbehin Abideen Adeyinka"
       - key: PLATFORM_BANK_ACCOUNT_NUMBER
-        value: "0123456789"
+        value: "0077001820"
       - key: PLATFORM_BANK_SORT_CODE
         value: ""
       - key: PLATFORM_BANK_TRANSFER_NOTE
