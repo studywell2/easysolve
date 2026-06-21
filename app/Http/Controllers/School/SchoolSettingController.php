@@ -5,6 +5,7 @@ namespace App\Http\Controllers\School;
 use App\Http\Controllers\Controller;
 use App\Models\School;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class SchoolSettingController extends Controller
 {
@@ -27,7 +28,15 @@ class SchoolSettingController extends Controller
             'address' => 'nullable|string|max:500',
             'short_name' => 'nullable|string|max:20',
             'motto' => 'nullable|string|max:255',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,svg,webp|max:2048',
         ]);
+
+        if ($request->hasFile('logo')) {
+            if ($school->logo) {
+                Storage::disk('public')->delete($school->logo);
+            }
+            $validated['logo'] = $request->file('logo')->store('school-logos', 'public');
+        }
 
         $school->update($validated);
 

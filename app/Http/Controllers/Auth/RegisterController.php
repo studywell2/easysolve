@@ -52,8 +52,9 @@ class RegisterController extends Controller
                 'last_name' => $data['owner_last_name'],
                 'email' => $data['owner_email'],
                 'password' => $data['password'],
-                'role' => 'owner',
             ]);
+            $user->role = 'owner';
+            $user->save();
 
             $school->update(['owner_id' => $user->id]);
 

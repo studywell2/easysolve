@@ -16,6 +16,7 @@ class School extends Model
         'phone',
         'address',
         'motto',
+        'logo',
         'terms_and_conditions',
         'terms_updated_at',
         'subscription_status',

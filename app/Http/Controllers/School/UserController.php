@@ -88,7 +88,13 @@ class UserController extends Controller
         $subjects = $validated['subjects'] ?? [];
         unset($validated['subjects']);
 
+        $role = $validated['role'];
+        unset($validated['role']);
+
         $user = User::create($validated);
+        $user->role = $role;
+        $user->save();
+
         $user->subjects()->sync($subjects);
 
         // Send welcome email
@@ -153,7 +159,13 @@ class UserController extends Controller
         $subjects = $validated['subjects'] ?? [];
         unset($validated['subjects']);
 
+        $role = $validated['role'];
+        unset($validated['role']);
+
         $user->update($validated);
+        $user->role = $role;
+        $user->save();
+
         $user->subjects()->sync($subjects);
 
         return redirect()->route('school.users.index')->with('success', 'User updated successfully.');
@@ -280,9 +292,10 @@ class UserController extends Controller
                             'last_name' => $data['last_name'],
                             'email' => $parentEmail,
                             'password' => Hash::make($parentPassword),
-                            'role' => 'parent',
                             'is_active' => true,
                         ]);
+                        $parent->role = 'parent';
+                        $parent->save();
                         $parentId = $parent->id;
                         $parents[$parentEmail] = $parentId;
 
@@ -302,9 +315,10 @@ class UserController extends Controller
                     'last_name' => trim($data['last_name']),
                     'email' => $email,
                     'password' => Hash::make($userPassword),
-                    'role' => $role,
                     'is_active' => true,
                 ]);
+                $newUser->role = $role;
+                $newUser->save();
 
                 // Queue welcome email with the generated password
                 Mail::to($email)->queue(new UserWelcomeMail($newUser, $userPassword));

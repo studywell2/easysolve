@@ -22,25 +22,27 @@ class DatabaseSeeder extends Seeder
 
         // Super Admin — can access the platform admin panel at /admin
         // IMPORTANT: Change this password immediately after deployment!
-        User::firstOrCreate(
+        $admin = User::firstOrCreate(
             ['email' => 'admin@easysolve.com'],
             [
                 'first_name' => 'Super',
                 'last_name'  => 'Admin',
                 'password'   => Hash::make(env('SUPER_ADMIN_PASSWORD', 'Ea$ySolve@2026!Adm')),
-                'role'       => 'super_admin',
             ]
         );
+        $admin->role = 'super_admin';
+        $admin->save();
 
-        User::firstOrCreate(
+        $testUser = User::firstOrCreate(
             ['email' => 'test@example.com'],
             [
                 'first_name'         => 'Test',
                 'last_name'          => 'User',
                 'email_verified_at'  => now(),
                 'password'           => Hash::make('password'),
-                'role'               => 'owner',
             ]
         );
+        $testUser->role = 'owner';
+        $testUser->save();
     }
 }

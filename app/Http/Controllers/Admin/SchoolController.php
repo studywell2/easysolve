@@ -78,8 +78,9 @@ class SchoolController extends Controller
                 'last_name' => $validated['owner_last_name'],
                 'email' => $validated['owner_email'],
                 'password' => $validated['owner_password'],
-                'role' => 'owner',
             ]);
+            $user->role = 'owner';
+            $user->save();
 
             $school->update(['owner_id' => $user->id]);
 

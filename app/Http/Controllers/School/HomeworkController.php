@@ -182,7 +182,7 @@ class HomeworkController extends Controller
 
         $validated = $request->validate([
             'content' => 'nullable|string|max:10000',
-            'file' => 'nullable|file|max:10240', // 10MB max
+            'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf,docx,zip|max:10240', // 10MB max
         ]);
 
         $filePath = null;
