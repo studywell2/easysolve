@@ -10,6 +10,53 @@
         </div>
 
         <div class="space-y-6 max-w-2xl">
+            <!-- School Logo -->
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div class="px-6 py-5 border-b border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-violet-50 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25H4.5a.75.75 0 00-.75.75v3.5c0 .415.336.75.75.75h8.75a.75.75 0 00.75-.75V6.75a.75.75 0 00-.75-.75z"/></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800">School Logo</h3>
+                            <p class="text-xs text-slate-400">Upload your school crest or badge (max 2MB)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ route('school.settings.update') }}" enctype="multipart/form-data">
+                    @csrf @method('PUT')
+
+                    <div class="p-6">
+                        <div class="flex items-center gap-5">
+                            <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-brand-400 to-indigo-600 flex items-center justify-center shadow-lg shadow-brand-500/20 flex-shrink-0 overflow-hidden">
+                                @if($school->logo)
+                                    <img src="{{ \Illuminate\Support\Facades\Storage::url($school->logo) }}" alt="{{ $school->name }} logo" class="w-full h-full object-cover">
+                                @else
+                                    <span class="text-white font-extrabold text-2xl">ES</span>
+                                @endif
+                            </div>
+                            <div class="flex-1">
+                                <label for="logo" class="inline-flex items-center gap-2 cursor-pointer bg-gray-50 hover:bg-gray-100 border border-gray-200 text-slate-600 font-semibold px-4 py-2.5 rounded-xl transition text-sm">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                                    Choose Image
+                                </label>
+                                <input type="file" id="logo" name="logo" accept="image/jpeg,image/png,image/jpg,image/svg+xml,image/webp" class="hidden" onchange="document.getElementById('logo-file-name').textContent = this.files[0]?.name || ''">
+                                <p id="logo-file-name" class="text-xs text-slate-400 mt-2">No file selected</p>
+                                @error('logo')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-gray-100 px-6 py-4">
+                        <button type="submit" class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-6 py-2.5 rounded-xl shadow-lg shadow-brand-600/20 hover:shadow-brand-600/30 transition text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Upload Logo
+                        </button>
+                    </div>
+                </form>
+            </div>
+
             <!-- General Information -->
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-100">
