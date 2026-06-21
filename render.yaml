@@ -26,7 +26,7 @@ services:
       - key: APP_DEBUG
         value: "false"
       - key: APP_KEY
-        sync: false  # Generated at runtime by Dockerfile CMD
+        generateValue: true  # Render generates a persistent random key
       - key: APP_URL
         value: https://easysolve.onrender.com  # ← Change after deploy to your URL
 
@@ -40,11 +40,13 @@ services:
       - key: DB_PORT
         value: "5432"
       - key: DB_DATABASE
-        value: easysolve
+        fromDatabase:
+          name: easysolve-db
+          property: database
       - key: DB_USERNAME
         fromDatabase:
           name: easysolve-db
-          property: username
+          property: user
       - key: DB_PASSWORD
         fromDatabase:
           name: easysolve-db

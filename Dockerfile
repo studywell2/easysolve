@@ -93,9 +93,9 @@ ENV PORT=80
 
 EXPOSE 80
 
-# Entrypoint: generate key if missing, migrate, seed, cache, storage link, start
-CMD if [ -z "$APP_KEY" ] || [ "${APP_KEY#base64:}" = "$APP_KEY" ]; then \
-        php artisan key:generate --force; \
+# Entrypoint: ensure APP_KEY has base64: prefix, migrate, seed, cache, start
+CMD if [ -n "$APP_KEY" ] && [ "${APP_KEY#base64:}" = "$APP_KEY" ]; then \
+        export APP_KEY="base64:$APP_KEY"; \
     fi && \
     php artisan storage:link || true && \
     php artisan migrate --force && \
