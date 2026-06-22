@@ -142,6 +142,80 @@
         .search-highlight {
             @apply bg-brand-100 text-brand-700 rounded px-0.5;
         }
+
+        /* ====== Premium Card System ====== */
+        /* Base card enhancement — deeper shadows, smoother transitions */
+        .bg-white.rounded-2xl.border.border-gray-100.shadow-sm {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
+            transition: box-shadow 0.35s cubic-bezier(0.4,0,0.2,1), transform 0.35s cubic-bezier(0.4,0,0.2,1), border-color 0.35s ease;
+        }
+
+        /* Hover lift for interactive cards (links, stat cards) */
+        a.bg-white.rounded-2xl.border.border-gray-100.shadow-sm:hover,
+        .bg-white.rounded-2xl.border.border-gray-100.shadow-sm:hover[class*="stat-glow"],
+        .bg-white.rounded-2xl.border.border-gray-100.shadow-sm:has(> div > a[href]) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px -8px rgba(0,0,0,0.1), 0 4px 12px -2px rgba(0,0,0,0.04);
+        }
+
+        /* Stat card hover glow intensifies */
+        .stat-glow-blue:hover { box-shadow: 0 12px 40px -8px rgba(37,99,235,0.35) !important; }
+        .stat-glow-emerald:hover { box-shadow: 0 12px 40px -8px rgba(5,150,105,0.35) !important; }
+        .stat-glow-amber:hover { box-shadow: 0 12px 40px -8px rgba(217,119,6,0.35) !important; }
+        .stat-glow-purple:hover { box-shadow: 0 12px 40px -8px rgba(124,58,237,0.35) !important; }
+
+        /* Gradient text for big stat numbers */
+        .text-3xl.font-extrabold {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Card top accent bar animation */
+        .bg-white.rounded-2xl > .absolute.top-0[class*="bg-gradient"] {
+            transition: height 0.3s ease;
+        }
+        .bg-white.rounded-2xl:hover > .absolute.top-0[class*="bg-gradient"] {
+            height: 4px;
+        }
+
+        /* Premium header treatment for cards with headers */
+        .bg-white.rounded-2xl > .border-b.border-gray-100:first-child {
+            background: linear-gradient(180deg, #fafbfc 0%, #ffffff 100%);
+        }
+
+        /* Table card hover — rows slide in */
+        .bg-white.rounded-2xl table tbody tr {
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        /* Focus ring enhancement */
+        .bg-white.rounded-2xl input:focus,
+        .bg-white.rounded-2xl select:focus,
+        .bg-white.rounded-2xl textarea:focus {
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+        }
+
+        /* Badge pop animation */
+        .sidebar-badge, [class*="rounded-full"][class*="font-bold"][class*="text-"] {
+            transition: transform 0.2s ease;
+        }
+        [class*="rounded-full"][class*="font-bold"]:hover {
+            transform: scale(1.08);
+        }
+
+        /* Quick action card hover — icon scales and tint */
+        a[class*="rounded-2xl"][class*="border"][class*="hover:"]:hover .w-11,
+        a[class*="rounded-2xl"][class*="border"][class*="hover:"]:hover .w-14 {
+            transform: scale(1.08);
+        }
+
+        /* Smooth scrollbar for card content areas */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.2); }
     </style>
     @stack('styles')
 </head>
