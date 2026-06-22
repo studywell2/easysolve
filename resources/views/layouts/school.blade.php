@@ -185,7 +185,7 @@
                 <div class="flex items-center gap-3 px-5 h-[68px] border-b border-gray-100 flex-shrink-0">
             <div class="w-10 h-10 bg-gradient-to-br from-brand-400 to-indigo-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-brand-600/40 relative overflow-hidden">
                 @if(auth()->user()->school?->logo)
-                    <img src="{{ \Illuminate\Support\Facades\Storage::url(auth()->user()->school->logo) }}" alt="{{ auth()->user()->school->short_name ?? 'School' }} logo" class="w-full h-full object-cover">
+                    <img src="{{ asset('storage/' . auth()->user()->school->logo) }}" alt="{{ auth()->user()->school->short_name ?? 'School' }} logo" class="w-full h-full object-cover">
                 @else
                     <span class="text-white font-extrabold text-sm">ES</span>
                 @endif
@@ -796,7 +796,7 @@
                     <a href="{{ route('school.dashboard') }}" class="flex items-center gap-2.5 flex-shrink-0">
                         <div class="w-9 h-9 bg-gradient-to-br from-brand-500 to-brand-600 rounded-xl flex items-center justify-center shadow-lg shadow-brand-500/20 flex-shrink-0 overflow-hidden">
                             @if(auth()->user()->school?->logo)
-                                <img src="{{ \Illuminate\Support\Facades\Storage::url(auth()->user()->school->logo) }}" alt="{{ auth()->user()->school->short_name ?? 'School' }} logo" class="w-full h-full object-cover">
+                                <img src="{{ asset('storage/' . auth()->user()->school->logo) }}" alt="{{ auth()->user()->school->short_name ?? 'School' }} logo" class="w-full h-full object-cover">
                             @else
                                 <span class="text-white font-extrabold text-sm">ES</span>
                             @endif

@@ -32,17 +32,5 @@ class DatabaseSeeder extends Seeder
         );
         $admin->role = 'super_admin';
         $admin->save();
-
-        $testUser = User::firstOrCreate(
-            ['email' => 'test@example.com'],
-            [
-                'first_name'         => 'Test',
-                'last_name'          => 'User',
-                'email_verified_at'  => now(),
-                'password'           => Hash::make('password'),
-            ]
-        );
-        $testUser->role = 'owner';
-        $testUser->save();
     }
 }

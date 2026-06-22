@@ -31,7 +31,7 @@
                         <div class="flex items-center gap-5">
                             <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-brand-400 to-indigo-600 flex items-center justify-center shadow-lg shadow-brand-500/20 flex-shrink-0 overflow-hidden">
                                 @if($school->logo)
-                                    <img src="{{ \Illuminate\Support\Facades\Storage::url($school->logo) }}" alt="{{ $school->name }} logo" class="w-full h-full object-cover">
+                                    <img src="{{ asset('storage/' . $school->logo) }}" alt="{{ $school->name }} logo" class="w-full h-full object-cover">
                                 @else
                                     <span class="text-white font-extrabold text-2xl">ES</span>
                                 @endif

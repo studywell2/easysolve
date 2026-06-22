@@ -52,15 +52,16 @@ services:
           name: easysolve-db
           property: password
 
-      # ── Sessions, cache, queue (database driver) ─────────
+      # ── Sessions, cache, queue ───────────────────────────
+      # Use "file" to avoid slow DB queries on Render free tier
       - key: SESSION_DRIVER
-        value: database
+        value: file
       - key: CACHE_STORE
-        value: database
+        value: file
       - key: QUEUE_CONNECTION
         value: database
       - key: FILESYSTEM_DISK
-        value: local
+        value: public
 
       # ── Mail (log for demo — no real email sent) ─────────
       - key: MAIL_MAILER
