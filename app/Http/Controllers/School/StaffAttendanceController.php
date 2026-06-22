@@ -34,7 +34,7 @@ class StaffAttendanceController extends Controller
                 'present_days' => StaffAttendance::where('user_id', $user->id)->whereNotNull('clock_out_at')->count(),
                 'avg_hours' => StaffAttendance::where('user_id', $user->id)
                     ->whereNotNull('clock_out_at')
-                    ->selectRaw('AVG(TIMESTAMPDIFF(MINUTE, clock_in_at, clock_out_at)) as avg')
+                    ->selectRaw('AVG(EXTRACT(EPOCH FROM (clock_out_at - clock_in_at)) / 60) as avg')
                     ->value('avg'),
             ];
             $stats['avg_hours'] = $stats['avg_hours'] ? round($stats['avg_hours'] / 60, 1) : 0;

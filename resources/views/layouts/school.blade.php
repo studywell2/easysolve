@@ -153,15 +153,25 @@
         $school = auth()->user()->school;
         $sidebarCounts = ['users' => 0, 'classes' => 0, 'libraryBooks' => 0, 'paymentsThisMonth' => 0, 'pendingRequests' => 0];
         if ($school) {
-            $sidebarCounts = cache()->remember("school.{$school->id}.sidebar_counts", 300, function() use ($school) {
-                return [
+            try {
+                $sidebarCounts = cache()->remember("school.{$school->id}.sidebar_counts", 300, function() use ($school) {
+                    return [
+                        'users' => $school->users()->count(),
+                        'classes' => $school->classes()->count(),
+                        'libraryBooks' => $school->libraryBooks()->count(),
+                        'paymentsThisMonth' => $school->payments()->whereMonth('created_at', now()->month)->count(),
+                        'pendingRequests' => $school->paymentRequests()->where('status', 'pending')->count(),
+                    ];
+                });
+            } catch (\Exception $e) {
+                $sidebarCounts = [
                     'users' => $school->users()->count(),
                     'classes' => $school->classes()->count(),
                     'libraryBooks' => $school->libraryBooks()->count(),
                     'paymentsThisMonth' => $school->payments()->whereMonth('created_at', now()->month)->count(),
                     'pendingRequests' => $school->paymentRequests()->where('status', 'pending')->count(),
                 ];
-            });
+            }
         }
     @endphp
 
@@ -206,7 +216,18 @@
         </div>
 
         <!-- Current Term Banner -->
-        @php $currentTerm = $school ? cache()->remember("school.{$school->id}.current_term", 300, fn() => $school->currentTerm) : null; @endphp
+        @php
+            $currentTerm = null;
+            if ($school) {
+                try {
+                    $currentTerm = cache()->remember("school.{$school->id}.current_term", 300, function() use ($school) {
+                        return $school->currentTerm;
+                    });
+                } catch (\Exception $e) {
+                    $currentTerm = $school->currentTerm;
+                }
+            }
+        @endphp
         @if($currentTerm)
         <div class="sidebar-term-banner mx-4 mt-4 px-3 py-2.5 rounded-xl bg-indigo-50 border border-indigo-100">
             <div class="flex items-center gap-2">
