@@ -3,12 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
     <title>@yield('title', 'Dashboard') — {{ auth()->user()->school?->name ?? 'EASYSOLVE' }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
@@ -216,11 +222,257 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.2); }
+
+        /* ====== Mesh Background ====== */
+        .mesh-bg {
+            background-color: #f4f6fb;
+            background-image:
+                radial-gradient(at 12% 8%, rgba(37, 99, 235, 0.04) 0px, transparent 50%),
+                radial-gradient(at 88% 12%, rgba(139, 92, 246, 0.03) 0px, transparent 50%),
+                radial-gradient(at 85% 88%, rgba(16, 185, 129, 0.03) 0px, transparent 50%),
+                radial-gradient(at 15% 85%, rgba(245, 158, 11, 0.025) 0px, transparent 50%);
+        }
+
+        /* ====== Gradient Page Title Accent ====== */
+        .page-title-accent {
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+            height: 3px;
+            width: 32px;
+            border-radius: 2px;
+            margin-top: 4px;
+        }
+
+        /* ====== Toast Notifications ====== */
+        @keyframes toastSlideIn {
+            from { opacity: 0; transform: translateX(120%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes toastSlideOut {
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(120%); }
+        }
+        @keyframes toastProgress {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+        .toast-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            pointer-events: none;
+            max-width: 380px;
+            width: calc(100vw - 2rem);
+        }
+        .toast {
+            pointer-events: auto;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 1rem 1.25rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 40px -8px rgba(0,0,0,0.15), 0 4px 12px -2px rgba(0,0,0,0.06);
+            animation: toastSlideIn 0.4s cubic-bezier(0.21, 1.02, 0.73, 1) both;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+        .toast.removing { animation: toastSlideOut 0.3s ease-in both; }
+        .toast-success { background: #ffffff; border-left: 4px solid #10b981; }
+        .toast-error { background: #ffffff; border-left: 4px solid #ef4444; }
+        .toast-info { background: #ffffff; border-left: 4px solid #3b82f6; }
+        .toast-icon {
+            width: 2.25rem; height: 2.25rem; border-radius: 0.75rem;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .toast-success .toast-icon { background: #ecfdf5; color: #059669; }
+        .toast-error .toast-icon { background: #fef2f2; color: #dc2626; }
+        .toast-info .toast-icon { background: #eff6ff; color: #2563eb; }
+        .toast-body { flex: 1; min-width: 0; }
+        .toast-title { font-size: 0.875rem; font-weight: 700; color: #1e293b; line-height: 1.3; }
+        .toast-message { font-size: 0.8125rem; color: #64748b; margin-top: 0.125rem; line-height: 1.4; }
+        .toast-close { flex-shrink: 0; padding: 0.25rem; border-radius: 0.5rem; color: #94a3b8; cursor: pointer; transition: all 0.15s; background: none; border: none; }
+        .toast-close:hover { background: #f1f5f9; color: #475569; }
+        .toast-progress-bar {
+            position: absolute; bottom: 0; left: 0; height: 2px;
+            animation: toastProgress 4s linear forwards;
+        }
+        .toast-success .toast-progress-bar { background: #10b981; }
+        .toast-error .toast-progress-bar { background: #ef4444; }
+        .toast-info .toast-progress-bar { background: #3b82f6; }
+
+        /* ====== Loading Skeletons ====== */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .skeleton {
+            background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 0.5rem;
+        }
+        .skeleton-text { height: 0.75rem; margin-bottom: 0.5rem; border-radius: 0.375rem; }
+        .skeleton-text:last-child { width: 60%; margin-bottom: 0; }
+        .skeleton-avatar { width: 2.25rem; height: 2.25rem; border-radius: 50%; }
+        .skeleton-card { height: 8rem; border-radius: 1rem; }
+
+        /* ====== Enhanced Empty States ====== */
+        .empty-state-icon {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+
+        /* ====== Mobile Bottom Nav (Students/Parents) ====== */
+        .mobile-bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            z-index: 45;
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(229, 231, 235, 0.6);
+            padding: 0.5rem 0;
+            padding-bottom: env(safe-area-inset-bottom, 0.5rem);
+        }
+        .mobile-bottom-nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 0.125rem;
+            padding: 0.375rem 0.5rem; border-radius: 0.75rem;
+            transition: all 0.15s; cursor: pointer; flex: 1;
+            font-size: 0.625rem; font-weight: 600; color: #94a3b8;
+        }
+        .mobile-bottom-nav-item.active { color: #3b82f6; }
+        .mobile-bottom-nav-item svg { width: 1.25rem; height: 1.25rem; }
+        .mobile-bottom-nav-item:active { transform: scale(0.92); }
+
+        /* ====== Dark Mode Overrides ====== */
+        html.dark { color-scheme: dark; }
+        html.dark body { background-color: #0b1120 !important; }
+        html.dark .mesh-bg {
+            background-color: #0b1120 !important;
+            background-image:
+                radial-gradient(at 12% 8%, rgba(37, 99, 235, 0.06) 0px, transparent 50%),
+                radial-gradient(at 88% 12%, rgba(139, 92, 246, 0.05) 0px, transparent 50%),
+                radial-gradient(at 85% 88%, rgba(16, 185, 129, 0.04) 0px, transparent 50%),
+                radial-gradient(at 15% 85%, rgba(245, 158, 11, 0.03) 0px, transparent 50%);
+        }
+        /* Cards & containers */
+        html.dark .bg-white { background-color: #1e293b !important; }
+        html.dark .bg-white\/70 { background-color: rgba(30, 41, 59, 0.8) !important; }
+        html.dark .bg-white\/80 { background-color: rgba(30, 41, 59, 0.85) !important; }
+        html.dark .bg-white\/50 { background-color: rgba(30, 41, 59, 0.5) !important; }
+        html.dark .bg-white\/15 { background-color: rgba(30, 41, 59, 0.2) !important; }
+        html.dark .bg-gray-50 { background-color: #0f172a !important; }
+        html.dark .bg-gray-100 { background-color: #1e293b !important; }
+        html.dark .bg-gray-100\/80 { background-color: rgba(30, 41, 59, 0.8) !important; }
+        html.dark .bg-gray-50\/50 { background-color: rgba(15, 23, 42, 0.5) !important; }
+        html.dark .bg-slate-50 { background-color: #0f172a !important; }
+        /* Text colors */
+        html.dark .text-slate-900 { color: #f8fafc !important; }
+        html.dark .text-slate-800 { color: #f1f5f9 !important; }
+        html.dark .text-slate-700 { color: #cbd5e1 !important; }
+        html.dark .text-slate-600 { color: #94a3b8 !important; }
+        html.dark .text-slate-500 { color: #94a3b8 !important; }
+        html.dark .text-slate-400 { color: #64748b !important; }
+        html.dark .text-gray-700 { color: #cbd5e1 !important; }
+        html.dark .text-gray-600 { color: #94a3b8 !important; }
+        html.dark .text-gray-500 { color: #94a3b8 !important; }
+        html.dark .text-gray-400 { color: #64748b !important; }
+        /* Borders */
+        html.dark .border-gray-100 { border-color: #334155 !important; }
+        html.dark .border-gray-200 { border-color: #334155 !important; }
+        html.dark .border-gray-200\/60 { border-color: rgba(51, 65, 85, 0.6) !important; }
+        html.dark .border-gray-50 { border-color: #1e293b !important; }
+        html.dark .divide-gray-50 > * { border-color: #1e293b !important; }
+        html.dark .divide-gray-100 > * { border-color: #334155 !important; }
+        /* Hover states */
+        html.dark .hover\:bg-gray-50:hover { background-color: #334155 !important; }
+        html.dark .hover\:bg-gray-100:hover { background-color: #334155 !important; }
+        html.dark .hover\:bg-gray-50\/50:hover { background-color: rgba(51, 65, 85, 0.5) !important; }
+        html.dark .hover\:text-slate-900:hover { color: #f8fafc !important; }
+        html.dark .hover\:text-slate-700:hover { color: #cbd5e1 !important; }
+        html.dark .hover\:text-gray-700:hover { color: #cbd5e1 !important; }
+        html.dark .hover\:border-brand-200:hover { border-color: rgba(59, 130, 246, 0.4) !important; }
+        /* Inputs */
+        html.dark input, html.dark select, html.dark textarea {
+            background-color: #0f172a !important;
+            color: #e2e8f0 !important;
+            border-color: #334155 !important;
+        }
+        html.dark input::placeholder, html.dark textarea::placeholder { color: #475569 !important; }
+        html.dark input:focus, html.dark select:focus, html.dark textarea:focus {
+            background-color: #0f172a !important;
+            border-color: #3b82f6 !important;
+        }
+        /* Sidebar specific */
+        html.dark .sidebar-link:hover { background-color: #334155 !important; }
+        html.dark .sidebar-link.active { background-color: rgba(251, 191, 36, 0.1) !important; }
+        /* Toast dark mode */
+        html.dark .toast { background: #1e293b !important; box-shadow: 0 10px 40px -8px rgba(0,0,0,0.5); }
+        html.dark .toast-title { color: #f1f5f9; }
+        html.dark .toast-message { color: #94a3b8; }
+        html.dark .toast-close:hover { background: #334155; }
+        /* Skeleton dark mode */
+        html.dark .skeleton {
+            background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+            background-size: 200% 100%;
+        }
+        /* Empty state dark mode */
+        html.dark .empty-state-icon {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        }
+        /* Mobile bottom nav dark mode */
+        html.dark .mobile-bottom-nav {
+            background: rgba(15, 23, 42, 0.95);
+            border-top-color: rgba(51, 65, 85, 0.6);
+        }
+        html.dark .mobile-bottom-nav-item { color: #64748b; }
+        html.dark .mobile-bottom-nav-item.active { color: #60a5fa; }
+        /* Table dark mode */
+        html.dark table thead { background-color: #0f172a !important; }
+        html.dark .data-table thead th { background-color: #0f172a !important; color: #64748b !important; }
+        html.dark table tbody tr:hover { background-color: rgba(30, 41, 59, 0.5) !important; }
+        /* Footer dark mode */
+        html.dark .bg-white\/50 { background-color: rgba(30, 41, 59, 0.5) !important; }
+        /* Premium card dark adjustments */
+        html.dark .bg-white.rounded-2xl > .border-b.border-gray-100:first-child {
+            background: linear-gradient(180deg, #1e293b 0%, #1e293b 100%) !important;
+        }
+        /* Dark mode toggle button */
+        .theme-toggle {
+            display: flex; align-items: center; justify-content: center;
+            width: 2.25rem; height: 2.25rem; border-radius: 0.75rem;
+            color: #64748b; transition: all 0.2s; background: none; border: none; cursor: pointer;
+        }
+        .theme-toggle:hover { background: #f1f5f9; color: #475569; }
+        html.dark .theme-toggle:hover { background: #334155; color: #cbd5e1; }
+        .theme-toggle .sun-icon { display: none; }
+        .theme-toggle .moon-icon { display: block; }
+        html.dark .theme-toggle .sun-icon { display: block; }
+        html.dark .theme-toggle .moon-icon { display: none; }
+        /* Focus ring dark */
+        html.dark .bg-white.rounded-2xl input:focus,
+        html.dark .bg-white.rounded-2xl select:focus,
+        html.dark .bg-white.rounded-2xl textarea:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+        }
+        /* Gradient text dark */
+        html.dark .text-3xl.font-extrabold {
+            background: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        /* Backdrop header dark */
+        html.dark header.sticky { background-color: rgba(15, 23, 42, 0.8) !important; }
     </style>
     @stack('styles')
 </head>
 
-<body class="min-h-screen bg-[#f4f6fb] font-sans antialiased">
+<body class="min-h-screen mesh-bg font-sans antialiased">
 
     @php
         $isSchoolManager = auth()->user()->canManageSchool();
@@ -594,6 +846,7 @@
                     <div>
                         <h1 class="text-lg font-bold text-slate-800 leading-tight">@yield('title', 'Dashboard')</h1>
                         <p class="text-[12px] text-slate-400 hidden sm:block">@yield('subtitle', auth()->user()->school?->name ?? '')</p>
+                        <div class="page-title-accent"></div>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
@@ -611,6 +864,10 @@
                         </div>
                     </div>
                     <div class="w-px h-8 bg-gray-200 hidden md:block mx-1"></div>
+                    <button onclick="toggleTheme()" class="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">
+                        <svg class="moon-icon w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg>
+                        <svg class="sun-icon w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg>
+                    </button>
                     <span class="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-full {{ auth()->user()->isOwner() ? 'bg-gradient-to-r from-amber-50 to-orange-50 text-amber-700 border border-amber-100' : (auth()->user()->isAdmin() ? 'bg-gradient-to-r from-brand-50 to-indigo-50 text-brand-700 border border-brand-100' : 'bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 border border-emerald-100') }}">
                         <span class="w-1.5 h-1.5 rounded-full {{ auth()->user()->isOwner() ? 'bg-amber-500' : (auth()->user()->isAdmin() ? 'bg-brand-500' : 'bg-emerald-500') }} animate-pulse"></span>
                         {{ auth()->user()->isOwner() ? 'Owner' : (auth()->user()->isAdmin() ? 'Admin' : 'Teacher') }}
@@ -631,15 +888,6 @@
         </header>
 
         <main class="flex-1 p-4 sm:p-6 lg:p-8">
-            @if(session('success'))
-                <div class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl p-4 flex items-center gap-3 animate-fade-up">
-                    <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                        <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
-                    </div>
-                    <p class="text-sm font-medium">{{ session('success') }}</p>
-                </div>
-            @endif
-
             @yield('content')
         </main>
 
@@ -906,6 +1154,10 @@
 
                 <!-- Right: Controls -->
                 <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                    <button onclick="toggleTheme()" class="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">
+                        <svg class="moon-icon w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg>
+                        <svg class="sun-icon w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg>
+                    </button>
                     <span class="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-full bg-gradient-to-r from-brand-50 to-indigo-50 text-brand-700 border border-brand-100">
                         <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
                         {{ ucfirst(auth()->user()->role) }}
@@ -1023,15 +1275,6 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        @if(session('success'))
-            <div class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl p-4 flex items-center gap-3 animate-fade-up">
-                <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                    <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
-                </div>
-                <p class="text-sm font-medium">{{ session('success') }}</p>
-            </div>
-        @endif
-
         @yield('content')
     </main>
 
@@ -1041,6 +1284,36 @@
             <span class="flex items-center gap-1.5 justify-center">Built by <span class="font-semibold text-brand-600">WETech Technology</span></span>
         </div>
     </footer>
+    @endif
+
+    {{-- Toast Notification Container --}}
+    <div class="toast-container" id="toast-container"></div>
+
+    {{-- Mobile Bottom Nav for Students/Parents --}}
+    @if(!$isSchoolManager)
+    <nav class="mobile-bottom-nav md:hidden" id="mobile-bottom-nav" style="display: flex;">
+        <a href="{{ route('school.dashboard') }}" class="mobile-bottom-nav-item {{ request()->routeIs('school.dashboard') ? 'active' : '' }}">
+            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.5a.75.75 0 00.75.75h4.5a.75.75 0 00.75-.75V15a.75.75 0 01.75-.75h3a.75.75 0 01.75.75v4.5a.75.75 0 00.75.75h4.5a.75.75 0 00.75-.75V9.75M8.25 3h7.5"/></svg>
+            Home
+        </a>
+        <a href="{{ route('school.grades.index') }}" class="mobile-bottom-nav-item {{ request()->routeIs('school.grades.*') ? 'active' : '' }}">
+            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+            Grades
+        </a>
+        <a href="{{ route('school.payments.index') }}" class="mobile-bottom-nav-item {{ request()->routeIs('school.payments.*') ? 'active' : '' }}">
+            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/></svg>
+            Payments
+        </a>
+        <button onclick="toggleMobileMenu()" class="mobile-bottom-nav-item" type="button">
+            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
+            More
+        </button>
+    </nav>
+    <style>
+        @media(max-width: 767px) {
+            body:not(.has-bottom-nav-hidden) main { padding-bottom: 4.5rem !important; }
+        }
+    </style>
     @endif
 
     {{-- Mobile menu toggle for student/parent layout --}}
@@ -1088,6 +1361,67 @@
         });
     </script>
     @endif
+
+    {{-- Dark Mode + Toast JS --}}
+    <script>
+        // ===== Dark Mode Toggle =====
+        function toggleTheme() {
+            const html = document.documentElement;
+            html.classList.toggle('dark');
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+        }
+        // Restore theme on load
+        (function() {
+            const saved = localStorage.getItem('theme');
+            if (saved === 'dark') {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+
+        // ===== Toast Notifications =====
+        (function() {
+            const container = document.getElementById('toast-container');
+            const icons = {
+                success: '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>',
+                error: '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>',
+                info: '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>',
+            };
+            const titles = { success: 'Success', error: 'Error', info: 'Info' };
+
+            window.showToast = function(message, type) {
+                type = type || 'success';
+                const toast = document.createElement('div');
+                toast.className = 'toast toast-' + type;
+                toast.innerHTML =
+                    '<div class="toast-icon">' + (icons[type] || icons.info) + '</div>' +
+                    '<div class="toast-body">' +
+                        '<p class="toast-title">' + (titles[type] || 'Info') + '</p>' +
+                        '<p class="toast-message">' + message + '</p>' +
+                    '</div>' +
+                    '<button class="toast-close" onclick="this.parentElement.classList.add(\'removing\'); setTimeout(function(){this.parentElement.remove()}.bind(this), 300)">' +
+                        '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>' +
+                    '</button>' +
+                    '<div class="toast-progress-bar"></div>';
+                container.appendChild(toast);
+
+                setTimeout(function() {
+                    toast.classList.add('removing');
+                    setTimeout(function() { toast.remove(); }, 300);
+                }, 4000);
+            };
+
+            // Auto-show session messages
+            @if(session('success'))
+                window.showToast('{{ addslashes(session('success')) }}', 'success');
+            @endif
+            @if(session('error'))
+                window.showToast('{{ addslashes(session('error')) }}', 'error');
+            @endif
+            @if(session('info'))
+                window.showToast('{{ addslashes(session('info')) }}', 'info');
+            @endif
+        })();
+    </script>
 
     @stack('scripts')
 </body>
