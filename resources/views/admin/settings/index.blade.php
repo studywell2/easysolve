@@ -49,7 +49,7 @@
                     <div class="p-6 space-y-5">
                         <div>
                             <label for="platform_name" class="block text-sm font-semibold text-slate-700 mb-1.5">Platform Name <span class="text-red-400">*</span></label>
-                            <input type="text" id="platform_name" name="platform_name" value="{{ old('platform_name', 'EASYSOLVE') }}"
+                            <input type="text" id="platform_name" name="platform_name" value="{{ old('platform_name', $settings['platform_name']) }}"
                                 class="w-full px-4 py-2.5 bg-gray-50/80 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/10 transition {{ $errors->has('platform_name') ? 'border-red-300' : '' }}">
                             <p class="text-xs text-slate-400 mt-1.5">This name appears in the sidebar and page titles</p>
                             @error('platform_name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
@@ -57,7 +57,7 @@
 
                         <div>
                             <label for="support_email" class="block text-sm font-semibold text-slate-700 mb-1.5">Support Email <span class="text-red-400">*</span></label>
-                            <input type="email" id="support_email" name="support_email" value="{{ old('support_email', 'support@easysolve.com') }}"
+                            <input type="email" id="support_email" name="support_email" value="{{ old('support_email', $settings['support_email']) }}"
                                 class="w-full px-4 py-2.5 bg-gray-50/80 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/10 transition {{ $errors->has('support_email') ? 'border-red-300' : '' }}">
                             <p class="text-xs text-slate-400 mt-1.5">Used for notification emails and support requests</p>
                             @error('support_email') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
