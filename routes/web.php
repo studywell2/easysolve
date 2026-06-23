@@ -31,7 +31,9 @@ use App\Http\Controllers\School\SubjectController;
 use App\Http\Controllers\School\TermsController;
 use App\Http\Controllers\School\TimetableController;
 use App\Http\Controllers\School\UserController;
+use App\Http\Controllers\Admin\FinanceController;
 use App\Http\Controllers\Admin\PaymentRequestController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\School\StaffAttendanceController;
 use Illuminate\Support\Facades\Route;
 
@@ -86,6 +88,18 @@ Route::middleware('auth')->group(function () {
         Route::post('payment-requests/{paymentRequest}/reject', [PaymentRequestController::class, 'reject'])->name('payment-requests.reject');
         Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
         Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
+
+        // User Management
+        Route::resource('users', AdminUserController::class)->except(['create', 'store']);
+        Route::post('users/{user}/toggle-active', [AdminUserController::class, 'toggleActive'])->name('users.toggle-active');
+
+        // Subscription Control
+        Route::post('schools/{school}/extend-trial', [SchoolController::class, 'extendTrial'])->name('schools.extend-trial');
+        Route::post('schools/{school}/activate', [SchoolController::class, 'activateSubscription'])->name('schools.activate');
+        Route::post('schools/{school}/suspend', [SchoolController::class, 'suspend'])->name('schools.suspend');
+
+        // Finance
+        Route::get('finance', [FinanceController::class, 'index'])->name('finance.index');
     });
 
     // ── School Portal (any user belonging to a school) ───────

@@ -209,6 +209,14 @@
                 <span class="sidebar-text">Add School</span>
             </a>
 
+            <a href="{{ route('admin.users.index') }}" data-tooltip="Users" data-nav-text="Users" class="sidebar-link {{ request()->routeIs('admin.users.*') ? 'active' : 'text-slate-600' }}">
+                <svg class="sidebar-icon w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/>
+                </svg>
+                <span class="sidebar-text">Users</span>
+                <span class="sidebar-badge ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600">{{ \App\Models\User::where('role', '!=', 'super_admin')->count() }}</span>
+            </a>
+
             <a href="{{ route('admin.plans.index') }}" data-tooltip="Subscription Plans" data-nav-text="Plans" class="sidebar-link {{ request()->routeIs('admin.plans.*') ? 'active' : 'text-slate-600' }}">
                 <svg class="sidebar-icon w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5M3.75 3h16.5M3.75 15a1.5 1.5 0 010 3M20.25 15a1.5 1.5 0 010 3M3.75 9a1.5 1.5 0 010-3M20.25 9a1.5 1.5 0 010-3"/>
@@ -226,6 +234,13 @@
                 @if($pendingPayments > 0)
                 <span class="sidebar-badge ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 animate-pulse">{{ $pendingPayments }}</span>
                 @endif
+            </a>
+
+            <a href="{{ route('admin.finance.index') }}" data-tooltip="Finance" data-nav-text="Finance" class="sidebar-link {{ request()->routeIs('admin.finance.*') ? 'active' : 'text-slate-600' }}">
+                <svg class="sidebar-icon w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/>
+                </svg>
+                <span class="sidebar-text">Finance</span>
             </a>
 
             {{-- System --}}

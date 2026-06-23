@@ -86,6 +86,115 @@
         </div>
     </div>
 
+    <!-- Subscription Management -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm animate-fade-up delay-3 mb-6">
+        <div class="px-6 py-5 border-b border-gray-100">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5M3.75 3h16.5M3.75 15a1.5 1.5 0 010 3M20.25 15a1.5 1.5 0 010 3M3.75 9a1.5 1.5 0 010-3M20.25 9a1.5 1.5 0 010-3"/></svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-slate-800">Subscription Management</h3>
+                    <p class="text-xs text-slate-400">Control this school's subscription lifecycle</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-6 space-y-6">
+            <!-- Current Subscription Details -->
+            <div class="bg-gray-50/80 rounded-xl p-4">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div>
+                        <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Status</p>
+                        <span class="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full mt-1 {{ $school->subscription_status === 'active' ? 'bg-emerald-50 text-emerald-600' : ($school->subscription_status === 'trial' ? 'bg-amber-50 text-amber-600' : 'bg-red-50 text-red-600') }}">
+                            <span class="w-1.5 h-1.5 rounded-full {{ $school->subscription_status === 'active' ? 'bg-emerald-500' : ($school->subscription_status === 'trial' ? 'bg-amber-500' : 'bg-red-500') }}"></span>
+                            {{ ucfirst($school->subscription_status) }}
+                        </span>
+                    </div>
+                    <div>
+                        <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Plan</p>
+                        <p class="text-sm font-semibold text-slate-600 mt-1">{{ $school->plan?->name ?? '—' }}</p>
+                    </div>
+                    @if($school->activeSubscription)
+                        <div>
+                            <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Billing Cycle</p>
+                            <p class="text-sm font-semibold text-slate-600 mt-1 capitalize">{{ $school->activeSubscription->billing_cycle }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Ends At</p>
+                            <p class="text-sm font-semibold text-slate-600 mt-1">{{ $school->activeSubscription->ends_at?->format('M j, Y') ?? '—' }}</p>
+                        </div>
+                    @else
+                        <div>
+                            <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Trial Ends</p>
+                            <p class="text-sm font-semibold text-slate-600 mt-1">{{ $school->trial_ends_at?->format('M j, Y') ?? '—' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Days Left</p>
+                            <p class="text-sm font-semibold text-slate-600 mt-1">{{ $school->trialDaysLeft() }} days</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <!-- Extend Trial -->
+                <div class="border border-gray-200 rounded-xl p-4">
+                    <h4 class="text-xs font-bold text-slate-700 mb-3">Extend Trial</h4>
+                    <form method="POST" action="{{ route('admin.schools.extend-trial', $school) }}">
+                        @csrf
+                        <div class="flex gap-2">
+                            <input type="number" name="days" min="1" max="365" placeholder="Days" required
+                                class="w-full px-3 py-2 bg-gray-50/80 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/10 transition">
+                            <button type="submit" class="inline-flex items-center gap-1 bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold px-4 py-2 rounded-lg border border-amber-200 transition text-sm whitespace-nowrap">
+                                Extend
+                            </button>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-2">Adds days to the current trial period</p>
+                    </form>
+                </div>
+
+                <!-- Manually Activate -->
+                <div class="border border-gray-200 rounded-xl p-4">
+                    <h4 class="text-xs font-bold text-slate-700 mb-3">Manually Activate</h4>
+                    <form method="POST" action="{{ route('admin.schools.activate', $school) }}">
+                        @csrf
+                        <div class="space-y-2">
+                            <select name="plan_id" required class="w-full px-3 py-2 bg-gray-50/80 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/10 transition">
+                                <option value="">Select plan…</option>
+                                @foreach($plans as $plan)
+                                    <option value="{{ $plan->id }}">{{ $plan->name }}</option>
+                                @endforeach
+                            </select>
+                            <select name="billing_cycle" required class="w-full px-3 py-2 bg-gray-50/80 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/10 transition">
+                                <option value="monthly">Monthly</option>
+                                <option value="yearly">Yearly</option>
+                            </select>
+                            <button type="submit" class="w-full inline-flex items-center justify-center gap-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold px-4 py-2 rounded-lg border border-emerald-200 transition text-sm">
+                                Activate
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Suspend -->
+                <div class="border border-red-200 rounded-xl p-4">
+                    <h4 class="text-xs font-bold text-red-700 mb-3">Suspend Subscription</h4>
+                    <form method="POST" action="{{ route('admin.schools.suspend', $school) }}" onsubmit="return confirm('Suspend this school\\'s subscription? Users will lose access.')">
+                        @csrf
+                        <div class="space-y-2">
+                            <textarea name="reason" rows="2" placeholder="Reason (optional)"
+                                class="w-full px-3 py-2 bg-gray-50/80 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-red-400 focus:ring-2 focus:ring-red-500/10 transition resize-none"></textarea>
+                            <button type="submit" class="w-full inline-flex items-center justify-center gap-1 bg-red-50 hover:bg-red-100 text-red-700 font-semibold px-4 py-2 rounded-lg border border-red-200 transition text-sm">
+                                Suspend
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Users List -->
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm animate-fade-up delay-3">
         <div class="px-6 py-5 border-b border-gray-100">

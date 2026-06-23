@@ -100,10 +100,11 @@ class SchoolController extends Controller
 
     public function show(School $school)
     {
-        $school->load(['owner', 'users' => fn ($q) => $q->latest()->take(10)]);
+        $school->load(['owner', 'users' => fn ($q) => $q->latest()->take(10), 'activeSubscription.plan']);
         $school->loadCount(['users', 'classes']);
+        $plans = Plan::orderBy('sort_order')->get();
 
-        return view('admin.schools.show', compact('school'));
+        return view('admin.schools.show', compact('school', 'plans'));
     }
 
     public function edit(School $school)
@@ -133,5 +134,82 @@ class SchoolController extends Controller
         $school->delete();
 
         return redirect()->route('admin.schools.index')->with('success', 'School deleted successfully.');
+    }
+
+    public function extendTrial(Request $request, School $school)
+    {
+        $validated = $request->validate([
+            'days' => 'required|integer|min:1|max:365',
+        ]);
+
+        $newTrialEnd = $school->trial_ends_at
+            ? $school->trial_ends_at->addDays($validated['days'])
+            : now()->addDays($validated['days']);
+
+        $school->update([
+            'subscription_status' => 'trial',
+            'trial_ends_at' => $newTrialEnd,
+        ]);
+
+        $subscription = $school->subscriptions()->where('status', 'trial')->latest()->first();
+        if ($subscription) {
+            $subscription->update(['trial_ends_at' => $newTrialEnd]);
+        }
+
+        return back()->with('success', "Trial extended by {$validated['days']} days for {$school->name}.");
+    }
+
+    public function activateSubscription(Request $request, School $school)
+    {
+        $validated = $request->validate([
+            'plan_id' => 'required|exists:plans,id',
+            'billing_cycle' => 'required|in:monthly,yearly',
+        ]);
+
+        $startsAt = now();
+        $endsAt = $validated['billing_cycle'] === 'yearly'
+            ? $startsAt->copy()->addYear()
+            : $startsAt->copy()->addMonth();
+
+        DB::transaction(function () use ($school, $validated, $startsAt, $endsAt) {
+            $school->subscriptions()->where('status', 'active')->update([
+                'status' => 'canceled',
+                'canceled_at' => now(),
+            ]);
+
+            Subscription::create([
+                'school_id' => $school->id,
+                'plan_id' => $validated['plan_id'],
+                'status' => 'active',
+                'billing_cycle' => $validated['billing_cycle'],
+                'starts_at' => $startsAt,
+                'ends_at' => $endsAt,
+            ]);
+
+            $school->update([
+                'subscription_status' => 'active',
+                'plan_id' => $validated['plan_id'],
+            ]);
+        });
+
+        return back()->with('success', "Subscription activated for {$school->name} until {$endsAt->format('M j, Y')}.");
+    }
+
+    public function suspend(Request $request, School $school)
+    {
+        $validated = $request->validate([
+            'reason' => 'nullable|string|max:500',
+        ]);
+
+        DB::transaction(function () use ($school) {
+            $school->subscriptions()->where('status', 'active')->update([
+                'status' => 'canceled',
+                'canceled_at' => now(),
+            ]);
+
+            $school->update(['subscription_status' => 'expired']);
+        });
+
+        return back()->with('success', "Subscription suspended for {$school->name}.");
     }
 }
