@@ -7,6 +7,11 @@ use App\Models\User;
 use App\Models\SchoolClass;
 use App\Models\Payment;
 use App\Models\Attendance;
+use App\Models\Grade;
+use App\Models\Homework;
+use App\Models\Exam;
+use App\Models\Announcement;
+use App\Models\SchoolEvent;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -56,7 +61,74 @@ class DashboardController extends Controller
                 }
             }
 
-            return view('school.dashboard', compact('children', 'attendanceStats', 'childAttendanceStats'));
+            // Student dashboard widgets
+            $gradeSummary = null;
+            $pendingHomework = collect();
+            $upcomingExams = collect();
+            $recentAnnouncements = collect();
+            $upcomingEvents = collect();
+
+            if ($user->isStudent()) {
+                $currentTerm = $school?->currentTerm;
+
+                // Grade Performance Summary
+                if ($currentTerm) {
+                    $grades = Grade::where('student_id', $user->id)
+                        ->where('term_id', $currentTerm->id)
+                        ->with('subject')
+                        ->get();
+
+                    if ($grades->isNotEmpty()) {
+                        $totalScore = $grades->sum('total_score');
+                        $average = $totalScore / $grades->count();
+
+                        $gradeSummary = [
+                            'grades' => $grades,
+                            'average' => round($average, 1),
+                            'overall_grade' => Grade::calculateGrade($average),
+                            'total_score' => $totalScore,
+                            'subject_count' => $grades->count(),
+                            'term_name' => $currentTerm->name,
+                        ];
+                    }
+                }
+
+                // Pending Homework
+                $pendingHomework = Homework::where('class_id', $user->class_id)
+                    ->where('status', 'open')
+                    ->with(['subject', 'submissions' => fn($q) => $q->where('student_id', $user->id)])
+                    ->latest('due_date')
+                    ->take(5)
+                    ->get();
+
+                // Upcoming Exams (published, not yet ended)
+                $upcomingExams = Exam::published()
+                    ->where('class_id', $user->class_id)
+                    ->where('end_date', '>=', today())
+                    ->with(['schedules.subject'])
+                    ->orderBy('start_date')
+                    ->take(3)
+                    ->get();
+
+                // Recent Announcements
+                $recentAnnouncements = Announcement::visibleTo($user)
+                    ->with('creator')
+                    ->latest()
+                    ->take(3)
+                    ->get();
+
+                // Upcoming Events
+                $upcomingEvents = SchoolEvent::visibleTo($user)
+                    ->upcoming()
+                    ->take(3)
+                    ->get();
+            }
+
+            return view('school.dashboard', compact(
+                'children', 'attendanceStats', 'childAttendanceStats',
+                'gradeSummary', 'pendingHomework', 'upcomingExams',
+                'recentAnnouncements', 'upcomingEvents'
+            ));
         }
 
         $stats = [

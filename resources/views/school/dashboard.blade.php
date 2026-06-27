@@ -498,6 +498,280 @@
     </div>
     @endif
 
+    {{-- ===== STUDENT DASHBOARD WIDGETS ===== --}}
+    @if(auth()->user()->isStudent())
+
+    {{-- Grade Performance Summary + Pending Homework --}}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        {{-- Grade Performance Summary (2 cols) --}}
+        <div class="lg:col-span-2 animate-fade-up delay-2 relative overflow-hidden bg-white rounded-2xl border border-gray-100 shadow-sm">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-teal-400"></div>
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/25">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800">Grade Performance</h3>
+                            <p class="text-xs text-slate-400">{{ $gradeSummary ? $gradeSummary['term_name'] : 'Current term' }}</p>
+                        </div>
+                    </div>
+                    <a href="{{ route('school.grades.index') }}" class="inline-flex items-center gap-1 text-xs font-semibold text-brand-600 hover:text-brand-700 transition">
+                        View All
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+                    </a>
+                </div>
+
+                @if($gradeSummary)
+                <div class="flex flex-col sm:flex-row items-center gap-6">
+                    {{-- Average Score + Grade Badge --}}
+                    <div class="flex-shrink-0 text-center">
+                        <div class="relative w-24 h-24 mx-auto">
+                            <svg class="w-24 h-24 -rotate-90" viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="42" fill="none" stroke="#f3f4f6" stroke-width="6"/>
+                                <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-dasharray="{{ ($gradeSummary['average'] / 100) * 263.89 }} 263.89" class="{{ $gradeSummary['average'] >= 70 ? 'text-emerald-500' : ($gradeSummary['average'] >= 50 ? 'text-amber-500' : 'text-red-500') }} transition-all duration-1000"/>
+                            </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <p class="text-2xl font-extrabold {{ $gradeSummary['average'] >= 70 ? 'text-emerald-600' : ($gradeSummary['average'] >= 50 ? 'text-amber-600' : 'text-red-600') }}">{{ $gradeSummary['average'] }}</p>
+                                <p class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">Average</p>
+                            </div>
+                        </div>
+                        @php $gradeColor = ['A' => 'bg-emerald-100 text-emerald-700', 'B' => 'bg-blue-100 text-blue-700', 'C' => 'bg-amber-100 text-amber-700', 'D' => 'bg-orange-100 text-orange-700', 'E' => 'bg-orange-100 text-orange-700', 'F' => 'bg-red-100 text-red-700'][$gradeSummary['overall_grade']] ?? 'bg-gray-100 text-gray-700'; @endphp
+                        <span class="inline-flex items-center gap-1 mt-2 text-xs font-bold px-3 py-1 rounded-full {{ $gradeColor }}">
+                            Grade {{ $gradeSummary['overall_grade'] }}
+                        </span>
+                    </div>
+
+                    {{-- Mini Bar Chart --}}
+                    <div class="flex-1 w-full overflow-x-auto">
+                        <div class="flex items-end justify-between gap-1.5 min-w-[200px]" style="height: 120px;">
+                            @foreach($gradeSummary['grades'] as $grade)
+                            @php $barHeight = max(8, ($grade->total_score / 100) * 100); @endphp
+                            <div class="flex-1 flex flex-col items-center gap-1.5 group min-w-[24px]">
+                                <div class="w-full flex flex-col justify-end h-[100px]">
+                                    <div class="w-full rounded-t-md transition-all duration-500 group-hover:opacity-80 {{ $grade->total_score >= 70 ? 'bg-emerald-400' : ($grade->total_score >= 50 ? 'bg-amber-400' : 'bg-red-400') }}" style="height: {{ $barHeight }}%;">
+                                        <span class="opacity-0 group-hover:opacity-100 transition-opacity text-[9px] font-bold text-white text-center block pt-0.5">{{ $grade->total_score }}</span>
+                                    </div>
+                                </div>
+                                <span class="text-[9px] text-slate-400 truncate max-w-[60px]">{{ \Illuminate\Support\Str::limit($grade->subject?->name ?? 'N/A', 8) }}</span>
+                            </div>
+                            @endforeach
+                        </div>
+                        <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+                            <span class="text-xs text-slate-400">{{ $gradeSummary['subject_count'] }} subjects</span>
+                            <span class="text-xs font-semibold text-slate-600">Total: {{ number_format((float)$gradeSummary['total_score'], 0) }}</span>
+                        </div>
+                    </div>
+                </div>
+                @else
+                <div class="py-8 text-center">
+                    <div class="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-7 h-7 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75z"/></svg>
+                    </div>
+                    <p class="text-sm text-slate-400">No grades published for this term yet</p>
+                </div>
+                @endif
+            </div>
+        </div>
+
+        {{-- Pending Homework --}}
+        <div class="animate-fade-up delay-3 relative overflow-hidden bg-white rounded-2xl border border-gray-100 shadow-sm">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-500 to-indigo-400"></div>
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-brand-500 to-indigo-500 flex items-center justify-center shadow-lg shadow-brand-500/25">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"/></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800">Pending Homework</h3>
+                            <p class="text-xs text-slate-400">Open assignments</p>
+                        </div>
+                    </div>
+                    <a href="{{ route('school.homework.index') }}" class="inline-flex items-center gap-1 text-xs font-semibold text-brand-600 hover:text-brand-700 transition">
+                        View All
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+                    </a>
+                </div>
+
+                @forelse($pendingHomework as $hw)
+                    @php $submission = $hw->submissions->first(); @endphp
+                    <div class="flex items-center gap-3 py-3 {{ !$loop->last ? 'border-b border-gray-50' : '' }}">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-semibold text-slate-800 truncate">{{ $hw->title }}</p>
+                            <p class="text-xs text-slate-400">{{ $hw->subject?->name ?? 'N/A' }}</p>
+                        </div>
+                        <div class="text-right flex-shrink-0">
+                            @if($hw->isOverdue() && !$submission)
+                                <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-red-50 text-red-600 border border-red-100">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                                    Overdue
+                                </span>
+                            @elseif($submission?->isGraded())
+                                <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                    Graded
+                                </span>
+                            @elseif($submission?->isSubmitted())
+                                <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                                    Submitted
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-amber-50 text-amber-600 border border-amber-100">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                    Pending
+                                </span>
+                            @endif
+                            <p class="text-[10px] text-slate-400 mt-1">Due {{ $hw->due_date->format('M d') }}</p>
+                        </div>
+                    </div>
+                @empty
+                    <div class="py-6 text-center">
+                        <div class="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                            <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <p class="text-sm text-slate-400">No pending homework</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+    </div>
+
+    {{-- Upcoming Exams + School Updates --}}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        {{-- Upcoming Exams --}}
+        <div class="animate-fade-up delay-3 relative overflow-hidden bg-white rounded-2xl border border-gray-100 shadow-sm">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-orange-400"></div>
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center shadow-lg shadow-red-500/25">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800">Upcoming Exams</h3>
+                            <p class="text-xs text-slate-400">Exam timetable</p>
+                        </div>
+                    </div>
+                    <a href="{{ route('school.exams.index') }}" class="inline-flex items-center gap-1 text-xs font-semibold text-brand-600 hover:text-brand-700 transition">
+                        View All
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+                    </a>
+                </div>
+
+                @forelse($upcomingExams as $exam)
+                    <div class="{{ !$loop->last ? 'border-b border-gray-50' : '' }} py-3">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="text-sm font-bold text-slate-800">{{ $exam->name }}</p>
+                            <span class="text-[10px] font-semibold text-slate-400">{{ $exam->formatted_date }}</span>
+                        </div>
+                        @if($exam->schedules->isNotEmpty())
+                        <div class="space-y-1.5">
+                            @foreach($exam->schedules->take(3) as $schedule)
+                            <div class="flex items-center gap-2 text-xs">
+                                <span class="w-1.5 h-1.5 rounded-full bg-brand-400 flex-shrink-0"></span>
+                                <span class="font-medium text-slate-700">{{ $schedule->subject?->name ?? 'N/A' }}</span>
+                                <span class="text-slate-400">{{ $schedule->date?->format('M d') }}</span>
+                                @if($schedule->start_time)
+                                <span class="text-slate-400">{{ $schedule->start_time->format('g:i A') }}</span>
+                                @endif
+                                @if($schedule->room)
+                                <span class="text-slate-400 ml-auto truncate">{{ $schedule->room }}</span>
+                                @endif
+                            </div>
+                            @endforeach
+                        </div>
+                        @endif
+                    </div>
+                @empty
+                    <div class="py-6 text-center">
+                        <div class="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                            <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        </div>
+                        <p class="text-sm text-slate-400">No upcoming exams</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
+        {{-- School Updates: Announcements + Events (2 cols) --}}
+        <div class="lg:col-span-2 animate-fade-up delay-4 relative overflow-hidden bg-white rounded-2xl border border-gray-100 shadow-sm">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-violet-400"></div>
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-purple-500 to-violet-500 flex items-center justify-center shadow-lg shadow-purple-500/25">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84a3 3 0 11-5.66 0M9 17.25h6m-3-12.75a7.5 7.5 0 100 15 7.5 7.5 0 000-15z"/></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800">School Updates</h3>
+                            <p class="text-xs text-slate-400">Announcements &amp; events</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {{-- Announcements --}}
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Announcements</h4>
+                            <a href="{{ route('school.announcements.index') }}" class="text-[11px] font-semibold text-brand-600 hover:text-brand-700 transition">View all</a>
+                        </div>
+                        @forelse($recentAnnouncements as $announcement)
+                        <div class="{{ !$loop->last ? 'border-b border-gray-50 pb-3 mb-3' : '' }}">
+                            <div class="flex items-start gap-2">
+                                <span class="w-2 h-2 rounded-full bg-purple-400 mt-1.5 flex-shrink-0"></span>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-sm font-semibold text-slate-800 truncate">{{ $announcement->title }}</p>
+                                    <p class="text-xs text-slate-400 line-clamp-2">{{ \Illuminate\Support\Str::limit(strip_tags($announcement->body), 80) }}</p>
+                                    <p class="text-[10px] text-slate-300 mt-1">{{ $announcement->created_at->diffForHumans() }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="py-4 text-center">
+                            <p class="text-xs text-slate-400">No announcements</p>
+                        </div>
+                        @endforelse
+                    </div>
+
+                    {{-- Events --}}
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Upcoming Events</h4>
+                            <a href="{{ route('school.events.index') }}" class="text-[11px] font-semibold text-brand-600 hover:text-brand-700 transition">View all</a>
+                        </div>
+                        @forelse($upcomingEvents as $event)
+                        <div class="{{ !$loop->last ? 'border-b border-gray-50 pb-3 mb-3' : '' }}">
+                            <div class="flex items-start gap-2">
+                                <div class="flex-shrink-0 w-10 text-center">
+                                    <p class="text-[10px] font-bold uppercase text-slate-400">{{ $event->start_date->format('M') }}</p>
+                                    <p class="text-lg font-extrabold text-slate-700 leading-none">{{ $event->start_date->format('j') }}</p>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-sm font-semibold text-slate-800 truncate">{{ $event->title }}</p>
+                                    <span class="inline-flex items-center text-[10px] font-bold px-1.5 py-0.5 rounded {{ $event->type_color }}">{{ $event->type_label }}</span>
+                                    @if($event->location)
+                                    <p class="text-[10px] text-slate-400 mt-0.5">{{ $event->location }}</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="py-4 text-center">
+                            <p class="text-xs text-slate-400">No upcoming events</p>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @endif
+
     {{-- Quick Access Cards --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
         @if(auth()->user()->isStudent())
