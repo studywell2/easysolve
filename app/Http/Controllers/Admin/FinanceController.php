@@ -21,10 +21,10 @@ class FinanceController extends Controller
 
         $monthlyData = PaymentRequest::where('status', 'verified')
             ->where('verified_at', '>=', now()->subMonths(11)->startOfMonth())
-            ->selectRaw('MONTH(verified_at) as month, YEAR(verified_at) as year, SUM(amount) as total')
-            ->groupBy('year', 'month')
-            ->orderBy('year')
-            ->orderBy('month')
+            ->selectRaw('EXTRACT(MONTH FROM verified_at) as month, EXTRACT(YEAR FROM verified_at) as year, SUM(amount) as total')
+            ->groupByRaw('EXTRACT(YEAR FROM verified_at), EXTRACT(MONTH FROM verified_at)')
+            ->orderByRaw('EXTRACT(YEAR FROM verified_at)')
+            ->orderByRaw('EXTRACT(MONTH FROM verified_at)')
             ->get();
 
         $transactions = PaymentRequest::with(['school', 'plan', 'verifier'])

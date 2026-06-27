@@ -47,6 +47,7 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction \
 RUN mkdir -p storage/framework/cache/data \
     storage/framework/sessions \
     storage/framework/views \
+    storage/fonts \
     storage/logs \
     storage/app/public \
     bootstrap/cache \
