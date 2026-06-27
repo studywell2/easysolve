@@ -1134,6 +1134,7 @@
                             <a href="{{ route('school.exams.index') }}" class="nav-link {{ request()->routeIs('school.exams.*') ? 'active' : '' }}">Exams</a>
                             <a href="{{ route('school.events.index') }}" class="nav-link {{ request()->routeIs('school.events.*') ? 'active' : '' }}">Events</a>
                             <a href="{{ route('school.payments.index') }}" class="nav-link {{ request()->routeIs('school.payments.*') ? 'active' : '' }}">Payments</a>
+                            <a href="{{ route('school.reports.report-card') }}" class="nav-link {{ request()->routeIs('school.reports.*') ? 'active' : '' }}">Report Card</a>
                             <a href="{{ route('school.announcements.index') }}" class="nav-link {{ request()->routeIs('school.announcements.*') ? 'active' : '' }}">Announcements</a>
                             <a href="{{ route('school.messages.index') }}" class="nav-link {{ request()->routeIs('school.messages.*') ? 'active' : '' }}">Messages</a>
                         @elseif(auth()->user()->isParent())
@@ -1224,6 +1225,7 @@
                             ['route' => 'school.exams.index', 'active' => 'school.exams.*', 'label' => 'Exams', 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'],
                             ['route' => 'school.events.index', 'active' => 'school.events.*', 'label' => 'Events', 'icon' => 'M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5'],
                             ['route' => 'school.payments.index', 'active' => 'school.payments.*', 'label' => 'Payments', 'icon' => 'M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z'],
+                            ['route' => 'school.reports.report-card', 'active' => 'school.reports.*', 'label' => 'Report Card', 'icon' => 'M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z'],
                             ['route' => 'school.announcements.index', 'active' => 'school.announcements.*', 'label' => 'Announcements', 'icon' => 'M10.34 15.84a3 3 0 11-5.66 0M9 17.25h6m-3-12.75a7.5 7.5 0 100 15 7.5 7.5 0 000-15z'],
                             ['route' => 'school.messages.index', 'active' => 'school.messages.*', 'label' => 'Messages', 'icon' => 'M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.294 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v.51z'],
                         ]);

@@ -67,6 +67,13 @@ class ReportController extends Controller
             return view('school.reports.report-card-select', compact('children', 'terms', 'isManager'));
         }
 
+        if ($user->isStudent()) {
+            $student = $user->load(['schoolClass', 'section']);
+            $isManager = false;
+            $isStudent = true;
+            return view('school.reports.report-card-select', compact('student', 'terms', 'isManager', 'isStudent'));
+        }
+
         $this->authorizeManager();
         $classes = SchoolClass::where('school_id', $schoolId)->active()->with('students')->get();
         $isManager = true;
@@ -92,6 +99,10 @@ class ReportController extends Controller
         if ($user->isParent()) {
             if (!$user->children()->where('id', $student->id)->exists()) {
                 abort(403, 'You can only download report cards for your own children.');
+            }
+        } elseif ($user->isStudent()) {
+            if ($student->id !== $user->id) {
+                abort(403, 'You can only download your own report card.');
             }
         } elseif (!$user->canManageSchool()) {
             abort(403, 'You do not have permission to perform this action.');

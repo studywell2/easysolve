@@ -75,7 +75,9 @@
             $chartData = collect([]);
             for ($i = 11; $i >= 0; $i--) {
                 $date = now()->subMonths($i);
-                $found = $monthlyData->where('month', $date->month)->where('year', $date->year)->first();
+                $found = $monthlyData->first(function ($item) use ($date) {
+                    return (int) $item->month === $date->month && (int) $item->year === $date->year;
+                });
                 $chartData->push([
                     'label' => $date->format('M'),
                     'total' => $found ? (float) $found->total : 0,

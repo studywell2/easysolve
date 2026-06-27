@@ -18,7 +18,7 @@
 
         <div class="mb-6">
             <h1 class="text-2xl font-extrabold text-slate-900">Report Card</h1>
-            <p class="text-sm text-slate-400 mt-0.5">{{ $isManager ? 'Download printable PDF report cards' : "Download your child's report card" }}</p>
+            <p class="text-sm text-slate-400 mt-0.5">{{ $isManager ? 'Download printable PDF report cards' : (isset($isStudent) && $isStudent ? 'Download your report card' : "Download your child's report card") }}</p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -32,7 +32,7 @@
                         </div>
                         <div>
                             <h3 class="text-sm font-bold text-slate-800">Individual Report Card</h3>
-                            <p class="text-xs text-slate-400">{{ $isManager ? 'Single student PDF with full details' : 'Download your child\'s PDF report card' }}</p>
+                            <p class="text-xs text-slate-400">{{ $isManager ? 'Single student PDF with full details' : (isset($isStudent) && $isStudent ? 'Download your PDF report card' : 'Download your child\'s PDF report card') }}</p>
                         </div>
                     </div>
                 </div>
@@ -58,6 +58,16 @@
                                 </select>
                             </div>
                             @else
+                            @if(isset($isStudent) && $isStudent)
+                            {{-- Student: Own report card, hidden student_id --}}
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Student</label>
+                                <div class="w-full px-4 py-2.5 bg-gray-50/80 border border-gray-200 rounded-xl text-sm text-slate-600">
+                                    {{ $student->full_name }} — {{ $student->schoolClass?->name ?? 'No class' }}
+                                </div>
+                                <input type="hidden" name="student_id" value="{{ $student->id }}">
+                            </div>
+                            @else
                             {{-- Parent: Children dropdown --}}
                             <div>
                                 <label class="block text-sm font-semibold text-slate-700 mb-1.5">Select Child</label>
@@ -68,6 +78,7 @@
                                     @endforeach
                                 </select>
                             </div>
+                            @endif
                             @endif
                             <div>
                                 <label class="block text-sm font-semibold text-slate-700 mb-1.5">Term</label>
@@ -139,7 +150,7 @@
                 </div>
                 <h3 class="text-sm font-bold text-slate-800 mb-2">About Report Cards</h3>
                 <p class="text-xs text-slate-500 leading-relaxed">
-                    Report cards contain your child's academic performance for the selected term, including subject grades, attendance summary, and class position. They are generated as PDF files you can download and print.
+                    Report cards contain {{ isset($isStudent) && $isStudent ? 'your' : "your child's" }} academic performance for the selected term, including subject grades, attendance summary, and class position. They are generated as PDF files you can download and print.
                 </p>
                 <p class="text-xs text-slate-400 mt-3">
                     If no grades appear, it means results haven't been published for that term yet. Please contact the school for more information.

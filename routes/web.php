@@ -42,9 +42,9 @@ use Illuminate\Support\Facades\Route;
 | Public Routes
 |--------------------------------------------------------------------------
 */
-Route::get('/', fn () => view('welcome'))->name('home');
-Route::get('/help', fn () => view('help'))->name('help');
-Route::get('/terms', fn () => view('terms'))->name('terms');
+Route::view('/', 'welcome')->name('home');
+Route::view('/help', 'help')->name('help');
+Route::view('/terms', 'terms')->name('terms');
 Route::get('/plans', [PlanController::class, 'index'])->name('plans.index');
 
 /*
