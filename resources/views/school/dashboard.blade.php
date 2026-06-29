@@ -433,6 +433,73 @@
     </div>
     @endif
 
+    {{-- Parent School Updates --}}
+    @if(auth()->user()->isParent())
+    <div class="animate-fade-up delay-2 relative overflow-hidden bg-white rounded-2xl border border-gray-100 shadow-sm mb-6">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-violet-400"></div>
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-purple-500 to-violet-500 flex items-center justify-center shadow-lg shadow-purple-500/25">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84a3 3 0 11-5.66 0M9 17.25h6m-3-12.75a7.5 7.5 0 100 15 7.5 7.5 0 000-15z"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800">School Updates</h3>
+                        <p class="text-xs text-slate-400">Announcements &amp; events</p>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Announcements</h4>
+                        <a href="{{ route('school.announcements.index') }}" class="text-[11px] font-semibold text-brand-600 hover:text-brand-700 transition">View all</a>
+                    </div>
+                    @forelse($recentAnnouncements as $announcement)
+                    <div class="{{ !$loop->last ? 'border-b border-gray-50 pb-3 mb-3' : '' }}">
+                        <div class="flex items-start gap-2">
+                            <span class="w-2 h-2 rounded-full bg-purple-400 mt-1.5 flex-shrink-0"></span>
+                            <div class="min-w-0 flex-1">
+                                <p class="text-sm font-semibold text-slate-800 truncate">{{ $announcement->title }}</p>
+                                <p class="text-xs text-slate-400 line-clamp-2">{{ \Illuminate\Support\Str::limit(strip_tags($announcement->body), 80) }}</p>
+                                <p class="text-[10px] text-slate-300 mt-1">{{ $announcement->created_at->diffForHumans() }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="py-4 text-center"><p class="text-xs text-slate-400">No announcements</p></div>
+                    @endforelse
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Upcoming Events</h4>
+                        <a href="{{ route('school.events.index') }}" class="text-[11px] font-semibold text-brand-600 hover:text-brand-700 transition">View all</a>
+                    </div>
+                    @forelse($upcomingEvents as $event)
+                    <div class="{{ !$loop->last ? 'border-b border-gray-50 pb-3 mb-3' : '' }}">
+                        <div class="flex items-start gap-2">
+                            <div class="flex-shrink-0 w-10 text-center">
+                                <p class="text-[10px] font-bold uppercase text-slate-400">{{ $event->start_date->format('M') }}</p>
+                                <p class="text-lg font-extrabold text-slate-700 leading-none">{{ $event->start_date->format('j') }}</p>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <p class="text-sm font-semibold text-slate-800 truncate">{{ $event->title }}</p>
+                                <span class="inline-flex items-center text-[10px] font-bold px-1.5 py-0.5 rounded {{ $event->type_color }}">{{ $event->type_label }}</span>
+                                @if($event->location)
+                                <p class="text-[10px] text-slate-400 mt-0.5">{{ $event->location }}</p>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="py-4 text-center"><p class="text-xs text-slate-400">No upcoming events</p></div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     {{-- Student Attendance Summary --}}
     @if(auth()->user()->isStudent() && $attendanceStats)
     <div class="animate-fade-up delay-1 relative overflow-hidden bg-white rounded-2xl border border-gray-100 shadow-sm mb-6">

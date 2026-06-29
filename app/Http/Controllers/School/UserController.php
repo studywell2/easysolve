@@ -61,7 +61,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
+            'email' => 'required|email',
             'role' => 'required|in:admin,teacher,student,parent',
             'class_id' => ['nullable', Rule::exists('classes', 'id')->where('school_id', $schoolId)],
             'section_id' => 'nullable|exists:sections,id',
@@ -69,6 +69,29 @@ class UserController extends Controller
             'subjects' => 'nullable|array',
             'subjects.*' => [Rule::exists('subjects', 'id')->where('school_id', $schoolId)],
         ]);
+
+        // Handle existing email — parents may already exist from CSV import
+        $existingUser = User::where('email', $validated['email'])->first();
+
+        if ($existingUser) {
+            if ($validated['role'] === 'parent') {
+                // Parent already exists in this school — just inform the admin
+                if ($existingUser->school_id === $schoolId) {
+                    $existingUser->update([
+                        'first_name' => $validated['first_name'],
+                        'last_name' => $validated['last_name'],
+                    ]);
+                    return redirect()->route('school.users.index')
+                        ->with('success', "Parent already exists. Name has been updated. You can now assign them to students.");
+                }
+                // Email exists in another school
+                return back()->withErrors(['email' => 'This email is already registered in another school. Please use a different email address.'])
+                    ->withInput();
+            }
+
+            // For non-parent roles, block if email exists
+            return back()->withErrors(['email' => 'This email is already registered.'])->withInput();
+        }
 
         // Verify section belongs to the selected class in this school
         if (!empty($validated['section_id']) && !empty($validated['class_id'])) {
