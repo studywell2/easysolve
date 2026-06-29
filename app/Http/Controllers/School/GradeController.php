@@ -5,6 +5,7 @@ namespace App\Http\Controllers\School;
 use App\Http\Controllers\Controller;
 use App\Mail\GradePublishedMail;
 use App\Models\Grade;
+use App\Models\HomeworkSubmission;
 use App\Models\SchoolClass;
 use App\Models\Subject;
 use App\Models\Term;
@@ -46,7 +47,32 @@ class GradeController extends Controller
 
         $grades = $query->latest()->paginate(20)->appends($request->query());
 
-        return view('school.grades.index', compact('grades', 'classes', 'subjects', 'terms'));
+        // Load homework averages per student/subject for display alongside grades
+        $homeworkAverages = collect();
+        $studentIds = $grades->pluck('student_id')->unique();
+        $subjectIds = $grades->pluck('subject_id')->unique();
+
+        if ($studentIds->isNotEmpty() && $subjectIds->isNotEmpty()) {
+            $hwSubs = HomeworkSubmission::whereHas('homework', function ($q) use ($schoolId, $subjectIds) {
+                $q->where('school_id', $schoolId)->whereIn('subject_id', $subjectIds);
+            })
+                ->whereIn('student_id', $studentIds)
+                ->where('status', 'graded')
+                ->with('homework')
+                ->get()
+                ->groupBy(fn($s) => $s->student_id . '-' . $s->homework->subject_id);
+
+            foreach ($hwSubs as $key => $subs) {
+                $avg = $subs->avg(function ($s) {
+                    return $s->homework->max_score > 0
+                        ? ($s->score / $s->homework->max_score) * 100
+                        : 0;
+                });
+                $homeworkAverages[$key] = round($avg, 1);
+            }
+        }
+
+        return view('school.grades.index', compact('grades', 'classes', 'subjects', 'terms', 'homeworkAverages'));
     }
 
     public function create()

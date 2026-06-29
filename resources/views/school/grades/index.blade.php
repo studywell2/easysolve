@@ -53,6 +53,7 @@
                             <th class="text-left py-3 px-4 font-semibold text-slate-500 uppercase tracking-wider text-xs">Subject</th>
                             <th class="text-center py-3 px-4 font-semibold text-slate-500 uppercase tracking-wider text-xs">CA (40)</th>
                             <th class="text-center py-3 px-4 font-semibold text-slate-500 uppercase tracking-wider text-xs">Exam (60)</th>
+                            <th class="text-center py-3 px-4 font-semibold text-slate-500 uppercase tracking-wider text-xs">HW Avg</th>
                             <th class="text-center py-3 px-4 font-semibold text-slate-500 uppercase tracking-wider text-xs">Total</th>
                             <th class="text-center py-3 px-4 font-semibold text-slate-500 uppercase tracking-wider text-xs">Grade</th>
                             <th class="text-left py-3 px-4 font-semibold text-slate-500 uppercase tracking-wider text-xs">Actions</th>
@@ -65,6 +66,16 @@
                             <td class="py-3 px-4 text-slate-600">{{ $g->subject?->name }}</td>
                             <td class="py-3 px-4 text-center text-slate-600">{{ $g->ca_score }}</td>
                             <td class="py-3 px-4 text-center text-slate-600">{{ $g->exam_score }}</td>
+                            @php $hwKey = $g->student_id . '-' . $g->subject_id; $hwAvg = $homeworkAverages[$hwKey] ?? null; @endphp
+                            <td class="py-3 px-4 text-center">
+                                @if($hwAvg !== null)
+                                    <span class="inline-flex items-center justify-center text-xs font-bold px-2 py-0.5 rounded-md {{ $hwAvg >= 70 ? 'bg-emerald-50 text-emerald-600' : ($hwAvg >= 50 ? 'bg-amber-50 text-amber-600' : 'bg-red-50 text-red-600') }}">
+                                        {{ $hwAvg }}%
+                                    </span>
+                                @else
+                                    <span class="text-slate-300 text-xs">—</span>
+                                @endif
+                            </td>
                             <td class="py-3 px-4 text-center font-bold text-slate-800">{{ $g->total_score }}</td>
                             <td class="py-3 px-4 text-center">
                                 <span class="inline-flex items-center justify-center w-8 h-7 text-xs font-bold rounded-lg {{ in_array($g->grade, ['A','B']) ? 'bg-emerald-100 text-emerald-700' : ($g->grade === 'C' ? 'bg-blue-100 text-blue-700' : ($g->grade === 'D' ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700')) }}">
@@ -87,7 +98,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="7" class="py-12 text-center">
+                            <td colspan="8" class="py-12 text-center">
                                 <div class="flex flex-col items-center justify-center">
                                     <div class="bg-gray-100 rounded-2xl p-4 mb-3">
                                         <svg class="w-16 h-16 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
