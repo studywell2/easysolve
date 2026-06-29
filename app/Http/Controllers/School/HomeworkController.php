@@ -10,6 +10,7 @@ use App\Models\Subject;
 use App\Models\Term;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class HomeworkController extends Controller
@@ -97,12 +98,44 @@ class HomeworkController extends Controller
 
         $submissions = collect();
         $studentSubmission = null;
+        $stats = null;
+        $notSubmittedStudents = collect();
 
         if ($user->canManageSchool()) {
             $submissions = $homework->submissions()
                 ->with(['student'])
                 ->latest()
                 ->paginate(20, ['*'], 'submissions_page');
+
+            // Submission statistics
+            $totalStudents = User::where('class_id', $homework->class_id)
+                ->where('role', 'student')
+                ->where('is_active', true)
+                ->count();
+
+            $submittedCount = $homework->submissions()
+                ->whereIn('status', ['submitted', 'graded', 'late'])
+                ->count();
+            $gradedCount = $homework->submissions()->where('status', 'graded')->count();
+            $lateCount = $homework->submissions()->where('status', 'late')->count();
+            $notSubmittedCount = max(0, $totalStudents - $submittedCount);
+
+            $stats = (object) [
+                'total' => $totalStudents,
+                'submitted' => $submittedCount,
+                'graded' => $gradedCount,
+                'late' => $lateCount,
+                'notSubmitted' => $notSubmittedCount,
+            ];
+
+            // Students who haven't submitted
+            $submittedStudentIds = $homework->submissions()->pluck('student_id')->toArray();
+            $notSubmittedStudents = User::where('class_id', $homework->class_id)
+                ->where('role', 'student')
+                ->where('is_active', true)
+                ->whereNotIn('id', $submittedStudentIds)
+                ->orderBy('first_name')
+                ->get();
         } elseif ($user->isStudent()) {
             $studentSubmission = $homework->submissions()->where('student_id', $user->id)->first();
         } elseif ($user->isParent()) {
@@ -110,7 +143,7 @@ class HomeworkController extends Controller
             $studentSubmission = $homework->submissions()->whereIn('student_id', $childrenIds)->with('student')->get();
         }
 
-        return view('school.homework.show', compact('homework', 'submissions', 'studentSubmission'));
+        return view('school.homework.show', compact('homework', 'submissions', 'studentSubmission', 'stats', 'notSubmittedStudents'));
     }
 
     public function edit(Homework $homework)
@@ -224,6 +257,42 @@ class HomeworkController extends Controller
         ]);
 
         return back()->with('success', 'Submission graded successfully.');
+    }
+
+    // ─── Close / Reopen ───────────────────────────────
+
+    public function close(Homework $homework)
+    {
+        $this->authorizeAccess($homework);
+        $this->authorizeManager();
+
+        $homework->update([
+            'status' => $homework->status === 'open' ? 'closed' : 'open',
+        ]);
+
+        $message = $homework->status === 'open'
+            ? 'Homework assignment reopened. Students can now submit.'
+            : 'Homework assignment closed. Students can no longer submit.';
+
+        return back()->with('success', $message);
+    }
+
+    // ─── Download Submission File ──────────────────────
+
+    public function downloadFile(HomeworkSubmission $submission)
+    {
+        $this->authorizeAccess($submission->homework);
+        $user = auth()->user();
+
+        if (!$user->canManageSchool() && $submission->student_id !== $user->id) {
+            abort(403);
+        }
+
+        if (!$submission->file_path) {
+            abort(404, 'No file attached to this submission.');
+        }
+
+        return Storage::disk('public')->download($submission->file_path);
     }
 
     // ─── Private Helpers ──────────────────────────────

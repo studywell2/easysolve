@@ -154,7 +154,9 @@ Route::middleware('auth')->group(function () {
                 // Homework
                 Route::resource('homework', HomeworkController::class);
                 Route::post('homework/{homework}/submit', [HomeworkController::class, 'submit'])->name('homework.submit');
+                Route::post('homework/{homework}/close', [HomeworkController::class, 'close'])->name('homework.close');
                 Route::post('homework/submissions/{submission}/grade', [HomeworkController::class, 'grade'])->name('homework.grade');
+                Route::get('homework/submissions/{submission}/download', [HomeworkController::class, 'downloadFile'])->name('homework.download');
 
                 // Exams
                 Route::resource('exams', ExamController::class);

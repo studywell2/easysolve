@@ -57,6 +57,6 @@ class HomeworkSubmission extends Model
 
     public function isSubmitted(): bool
     {
-        return in_array($this->status, ['submitted', 'graded']);
+        return in_array($this->status, ['submitted', 'graded', 'late']);
     }
 }

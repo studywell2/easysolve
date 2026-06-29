@@ -11,6 +11,18 @@
         </a>
         @if(auth()->user()->canManageSchool())
         <div class="flex items-center gap-2">
+            <form method="POST" action="{{ route('school.homework.close', $homework) }}" class="inline">
+                @csrf
+                <button type="submit" class="inline-flex items-center gap-1.5 bg-white border {{ $homework->status === 'open' ? 'border-amber-200 hover:bg-amber-50 text-amber-600' : 'border-emerald-200 hover:bg-emerald-50 text-emerald-600' }} text-sm font-semibold px-4 py-2 rounded-xl transition">
+                    @if($homework->status === 'open')
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+                    Close
+                    @else
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 119 0v3.75M3.75 15a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25V8.25a2.25 2.25 0 00-2.25-2.25H6A2.25 2.25 0 003.75 8.25V15z"/></svg>
+                    Reopen
+                    @endif
+                </button>
+            </form>
             <a href="{{ route('school.homework.edit', $homework) }}" class="inline-flex items-center gap-1.5 bg-white border border-gray-200 hover:bg-gray-50 text-slate-700 text-sm font-semibold px-4 py-2 rounded-xl transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/></svg>
                 Edit
@@ -64,6 +76,32 @@
             </div>
         </div>
     </div>
+
+    {{-- Submission Statistics --}}
+    @if(auth()->user()->canManageSchool() && $stats)
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 text-center">
+            <p class="text-2xl font-bold text-slate-800">{{ $stats->total }}</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">Total</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 text-center">
+            <p class="text-2xl font-bold text-emerald-600">{{ $stats->submitted }}</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">Submitted</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 text-center">
+            <p class="text-2xl font-bold text-blue-600">{{ $stats->graded }}</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">Graded</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 text-center">
+            <p class="text-2xl font-bold text-amber-600">{{ $stats->late }}</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">Late</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 text-center">
+            <p class="text-2xl font-bold text-red-500">{{ $stats->notSubmitted }}</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">Pending</p>
+        </div>
+    </div>
+    @endif
 
     @if(auth()->user()->isStudent() && $homework->status === 'open')
     {{-- Student Submission Form --}}
@@ -126,6 +164,7 @@
                         <th class="text-left px-5 py-3">Student</th>
                         <th class="text-left px-5 py-3">Status</th>
                         <th class="text-left px-5 py-3">Submitted</th>
+                        <th class="text-center px-5 py-3">Content</th>
                         <th class="text-left px-5 py-3">Score</th>
                         <th class="text-right px-5 py-3">Action</th>
                     </tr>
@@ -145,6 +184,23 @@
                             </span>
                         </td>
                         <td class="px-5 py-3 text-sm text-slate-500">{{ $sub->submitted_at?->format('M j, Y') ?? '—' }}</td>
+                        <td class="px-5 py-3 text-center">
+                            <div class="flex items-center justify-center gap-1.5">
+                                @if($sub->content)
+                                <span title="Has text answer">
+                                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                                </span>
+                                @endif
+                                @if($sub->file_path)
+                                <span title="Has file attachment">
+                                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l7.693-7.693a3 3 0 014.243 4.243L9.615 16.11a1.5 1.5 0 01-2.121-2.121l6.105-6.105"/></svg>
+                                </span>
+                                @endif
+                                @if(!$sub->content && !$sub->file_path)
+                                <span class="text-slate-300">—</span>
+                                @endif
+                            </div>
+                        </td>
                         <td class="px-5 py-3 text-sm font-semibold text-slate-700">
                             @if($sub->isGraded())
                                 {{ $sub->score }} / {{ $homework->max_score }}
@@ -152,13 +208,14 @@
                                 <span class="text-slate-300">—</span>
                             @endif
                         </td>
-                        <td class="px-5 py-3 text-right">
+                        <td class="px-5 py-3 text-right whitespace-nowrap">
+                            @if($sub->isSubmitted())
+                            <button onclick="openViewModal({{ $sub->id }}, '{{ addslashes($sub->student->full_name) }}')" class="text-xs font-semibold text-slate-600 hover:underline mr-3">View</button>
+                            @endif
                             @if(!$sub->isGraded() && $sub->isSubmitted())
                             <button onclick="openGradeModal({{ $sub->id }}, '{{ addslashes($sub->student->full_name) }}', {{ $homework->max_score }})" class="text-xs font-semibold text-brand-600 hover:underline">Grade</button>
                             @elseif($sub->isGraded())
                             <button onclick="openGradeModal({{ $sub->id }}, '{{ addslashes($sub->student->full_name) }}', {{ $homework->max_score }}, {{ $sub->score }}, '{{ addslashes($sub->feedback ?? '') }}')" class="text-xs font-semibold text-slate-500 hover:underline">Edit Grade</button>
-                            @else
-                            <span class="text-xs text-slate-300">Not submitted</span>
                             @endif
                         </td>
                     </tr>
@@ -168,6 +225,21 @@
         </div>
         <div class="px-5 py-3 border-t border-gray-50">
             {{ $submissions->links() }}
+        </div>
+    </div>
+    @endif
+
+    {{-- Not Submitted Students --}}
+    @if(auth()->user()->canManageSchool() && $notSubmittedStudents->isNotEmpty())
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
+        <h3 class="text-sm font-bold text-slate-800 mb-3">Students Who Haven't Submitted ({{ $notSubmittedStudents->count() }})</h3>
+        <div class="flex flex-wrap gap-2">
+            @foreach($notSubmittedStudents as $student)
+            <span class="inline-flex items-center gap-1.5 bg-gray-50 text-slate-600 text-xs font-medium px-3 py-1.5 rounded-lg">
+                <span class="w-5 h-5 bg-slate-200 rounded-full flex items-center justify-center text-[9px] font-bold text-slate-500">{{ $student->initials }}</span>
+                {{ $student->full_name }}
+            </span>
+            @endforeach
         </div>
     </div>
     @endif
@@ -245,6 +317,101 @@
 
     function closeGradeModal() {
         const modal = document.getElementById('grade-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+</script>
+
+{{-- View Submission Modal --}}
+<div id="view-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold text-slate-800">Submission Review</h3>
+            <button onclick="closeViewModal()" class="text-slate-400 hover:text-slate-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <p class="text-sm text-slate-500 mb-4">Student: <span id="view-student-name" class="font-semibold text-slate-700"></span></p>
+        <div id="view-modal-content"></div>
+    </div>
+</div>
+
+<script>
+    const submissionData = {};
+    @foreach($submissions as $sub)
+    submissionData[{{ $sub->id }}] = {
+        content: @json($sub->content),
+        fileUrl: @json($sub->file_path ? route('school.homework.download', $sub) : null),
+        status: {{ json_encode($sub->status) }},
+        submittedAt: {{ json_encode($sub->submitted_at?->format('M j, Y \a\t g:i A')) }},
+        score: {{ json_encode((string) $sub->score) }},
+        feedback: @json($sub->feedback),
+        maxScore: {{ json_encode((string) $homework->max_score) }},
+    };
+    @endforeach
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function openViewModal(submissionId, studentName) {
+        const data = submissionData[submissionId];
+        if (!data) return;
+
+        document.getElementById('view-student-name').textContent = studentName;
+
+        let html = '';
+
+        const statusColors = {
+            graded: 'bg-blue-50 text-blue-600',
+            submitted: 'bg-emerald-50 text-emerald-600',
+            late: 'bg-amber-50 text-amber-600',
+            pending: 'bg-gray-100 text-slate-500',
+        };
+        html += '<div class="flex items-center gap-3 mb-4">';
+        html += '<span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-md ' + (statusColors[data.status] || statusColors.pending) + '">' + data.status.charAt(0).toUpperCase() + data.status.slice(1) + '</span>';
+        if (data.submittedAt) {
+            html += '<span class="text-xs text-slate-500">Submitted: ' + data.submittedAt + '</span>';
+        }
+        html += '</div>';
+
+        if (data.content) {
+            html += '<div class="bg-gray-50 rounded-xl p-4 mb-3">';
+            html += '<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Student\'s Answer</p>';
+            html += '<p class="text-sm text-slate-600 whitespace-pre-line">' + escapeHtml(data.content) + '</p>';
+            html += '</div>';
+        }
+
+        if (data.fileUrl) {
+            html += '<a href="' + data.fileUrl + '" class="inline-flex items-center gap-2 bg-brand-50 hover:bg-brand-100 text-brand-700 text-sm font-semibold px-4 py-2.5 rounded-xl transition mb-3">';
+            html += '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>';
+            html += 'Download Attached File';
+            html += '</a>';
+        }
+
+        if (data.status === 'graded') {
+            html += '<div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mt-3">';
+            html += '<div class="flex items-center justify-between mb-2">';
+            html += '<span class="text-sm font-semibold text-slate-700">Score: ' + data.score + ' / ' + data.maxScore + '</span>';
+            html += '<span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-100 text-blue-600">GRADED</span>';
+            html += '</div>';
+            if (data.feedback) {
+                html += '<p class="text-sm text-slate-600 mt-2 p-3 bg-white rounded-lg border border-gray-100">' + escapeHtml(data.feedback) + '</p>';
+            }
+            html += '</div>';
+        }
+
+        document.getElementById('view-modal-content').innerHTML = html;
+
+        const modal = document.getElementById('view-modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    function closeViewModal() {
+        const modal = document.getElementById('view-modal');
         modal.classList.add('hidden');
         modal.classList.remove('flex');
     }
