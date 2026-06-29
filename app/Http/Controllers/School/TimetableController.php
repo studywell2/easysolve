@@ -15,10 +15,30 @@ class TimetableController extends Controller
 {
     public function index(Request $request)
     {
-        $schoolId = auth()->user()->school_id;
-        $classes = SchoolClass::where('school_id', $schoolId)->active()->get();
+        $user = auth()->user();
+        $schoolId = $user->school_id;
 
-        $selectedClass = $request->filled('class_id') ? $request->class_id : $classes->first()?->id;
+        // Role-based class filtering
+        if ($user->isStudent()) {
+            // Students: only see their own class timetable
+            $classes = SchoolClass::where('school_id', $schoolId)
+                ->where('id', $user->class_id)
+                ->active()
+                ->get();
+            $selectedClass = $user->class_id;
+        } elseif ($user->isParent()) {
+            // Parents: only see their children's class timetables
+            $childClassIds = $user->children()->whereNotNull('class_id')->pluck('class_id')->unique();
+            $classes = SchoolClass::where('school_id', $schoolId)
+                ->whereIn('id', $childClassIds)
+                ->active()
+                ->get();
+            $selectedClass = $request->filled('class_id') ? $request->class_id : $classes->first()?->id;
+        } else {
+            // Managers: see all classes
+            $classes = SchoolClass::where('school_id', $schoolId)->active()->get();
+            $selectedClass = $request->filled('class_id') ? $request->class_id : $classes->first()?->id;
+        }
 
         $timetables = collect();
         if ($selectedClass) {
@@ -31,7 +51,9 @@ class TimetableController extends Controller
                 ->groupBy('day_of_week');
         }
 
-        return view('school.timetable.index', compact('classes', 'timetables', 'selectedClass'));
+        $isManager = $user->canManageSchool();
+
+        return view('school.timetable.index', compact('classes', 'timetables', 'selectedClass', 'isManager'));
     }
 
     public function create()

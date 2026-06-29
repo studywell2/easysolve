@@ -18,6 +18,11 @@ class StaffAttendanceController extends Controller
         $user = auth()->user();
         $schoolId = $user->school_id;
 
+        // Only staff (owner, admin, teacher) can access staff attendance
+        if (!$user->canManageSchool()) {
+            abort(403, 'You do not have permission to access staff attendance.');
+        }
+
         // Today's record for the current user
         $todayRecord = $user->todayStaffAttendance;
 
@@ -89,6 +94,10 @@ class StaffAttendanceController extends Controller
     {
         $user = auth()->user();
 
+        if (!$user->canManageSchool()) {
+            abort(403, 'You do not have permission to access staff attendance.');
+        }
+
         $existing = $user->todayStaffAttendance;
 
         if ($existing && $existing->clock_in_at) {
@@ -121,6 +130,10 @@ class StaffAttendanceController extends Controller
     public function clockOut(Request $request)
     {
         $user = auth()->user();
+
+        if (!$user->canManageSchool()) {
+            abort(403, 'You do not have permission to access staff attendance.');
+        }
 
         $record = $user->todayStaffAttendance;
 

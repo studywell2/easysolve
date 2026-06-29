@@ -17,6 +17,7 @@ class ReportController extends Controller
 {
     public function index(Request $request)
     {
+        $this->authorizeManager();
         $schoolId = auth()->user()->school_id;
 
         // Enrollment summary

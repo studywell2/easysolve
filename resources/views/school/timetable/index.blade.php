@@ -17,7 +17,8 @@
             @endif
         </div>
 
-        {{-- Class Selector --}}
+        {{-- Class Selector (only show if more than one class available) --}}
+        @if($classes->count() > 1)
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6">
             <form method="GET" action="{{ route('school.timetable.index') }}" class="flex items-center gap-3">
                 <label class="text-sm font-semibold text-slate-500 whitespace-nowrap">Viewing:</label>
@@ -28,6 +29,15 @@
                 </select>
             </form>
         </div>
+        @elseif($classes->isEmpty())
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center mb-6">
+            <div class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0V11.25c0-1.243 1.007-2.25 2.25-2.25h13.5c1.243 0 2.25 1.007 2.25 2.25v7.5"/></svg>
+            </div>
+            <p class="text-sm font-semibold text-slate-400">No class assigned yet</p>
+            <p class="text-xs text-slate-400 mt-1">Please contact the school administrator to assign a class.</p>
+        </div>
+        @endif
 
         {{-- Weekly Grid --}}
         @php

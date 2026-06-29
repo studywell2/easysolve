@@ -45,11 +45,6 @@ class HomeworkController extends Controller
 
         $homework = $query->latest('due_date')->paginate(15)->appends($request->query());
 
-        // Load submission status for students/parents
-        if (!$user->canManageSchool()) {
-            $homework->load(['submissionFor' => fn ($q) => $q->where('student_id', $user->isStudent() ? $user->id : ($request->filled('student') ? $request->student : $user->children()->first()?->id))]);
-        }
-
         return view('school.homework.index', compact('homework', 'classes', 'subjects'));
     }
 

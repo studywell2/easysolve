@@ -124,6 +124,20 @@ class DashboardController extends Controller
                     ->get();
             }
 
+            // Parents also get announcements and events
+            if ($user->isParent()) {
+                $recentAnnouncements = Announcement::visibleTo($user)
+                    ->with('creator')
+                    ->latest()
+                    ->take(3)
+                    ->get();
+
+                $upcomingEvents = SchoolEvent::visibleTo($user)
+                    ->upcoming()
+                    ->take(3)
+                    ->get();
+            }
+
             return view('school.dashboard', compact(
                 'children', 'attendanceStats', 'childAttendanceStats',
                 'gradeSummary', 'pendingHomework', 'upcomingExams',

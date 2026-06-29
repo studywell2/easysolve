@@ -11,6 +11,7 @@ class SchoolSettingController extends Controller
 {
     public function index()
     {
+        $this->authorizeManager();
         $school = auth()->user()->school;
 
         return view('school.settings.index', compact('school'));
