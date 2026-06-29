@@ -116,5 +116,48 @@
             <div class="p-4 border-t border-gray-100">{{ $grades->withQueryString()->links() }}</div>
             @endif
         </div>
+
+        {{-- Homework Scores Section --}}
+        @if(auth()->user()->canManageSchool() && $homeworkSubmissions->isNotEmpty())
+        <div class="mt-6 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-gray-50 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-500 flex items-center justify-center shadow-lg shadow-brand-500/20">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"/></svg>
+                </div>
+                <div>
+                    <h2 class="text-base font-bold text-slate-800">Graded Homework</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">{{ $homeworkSubmissions->count() }} graded submission(s)</p>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="bg-gray-50 border-b border-gray-100">
+                            <th class="text-left py-3 px-4 font-semibold text-slate-500 uppercase tracking-wider text-xs">Student</th>
+                            <th class="text-left py-3 px-4 font-semibold text-slate-500 uppercase tracking-wider text-xs">Homework</th>
+                            <th class="text-left py-3 px-4 font-semibold text-slate-500 uppercase tracking-wider text-xs">Subject</th>
+                            <th class="text-center py-3 px-4 font-semibold text-slate-500 uppercase tracking-wider text-xs">Score</th>
+                            <th class="text-center py-3 px-4 font-semibold text-slate-500 uppercase tracking-wider text-xs">Graded On</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        @foreach($homeworkSubmissions as $hw)
+                        <tr class="hover:bg-gray-50/50 transition">
+                            <td class="py-3 px-4 font-medium text-slate-800">{{ $hw['student_name'] }}</td>
+                            <td class="py-3 px-4 text-slate-600">{{ $hw['homework_title'] }}</td>
+                            <td class="py-3 px-4 text-slate-600">{{ $hw['subject_name'] }}</td>
+                            <td class="py-3 px-4 text-center">
+                                <span class="inline-flex items-center justify-center text-xs font-bold px-2 py-0.5 rounded-md {{ ($hw['score'] / max(1, $hw['max_score'])) * 100 >= 70 ? 'bg-emerald-50 text-emerald-600' : (($hw['score'] / max(1, $hw['max_score'])) * 100 >= 50 ? 'bg-amber-50 text-amber-600' : 'bg-red-50 text-red-600') }}">
+                                    {{ $hw['score'] }} / {{ $hw['max_score'] }}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4 text-center text-xs text-slate-400">{{ $hw['graded_at']?->format('M j, Y') ?? '—' }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endif
     </div>
 @endsection

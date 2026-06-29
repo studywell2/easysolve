@@ -47,32 +47,56 @@ class GradeController extends Controller
 
         $grades = $query->latest()->paginate(20)->appends($request->query());
 
-        // Load homework averages per student/subject for display alongside grades
+        // Load homework averages per student/subject for the HW Avg column
         $homeworkAverages = collect();
-        $studentIds = $grades->pluck('student_id')->unique();
-        $subjectIds = $grades->pluck('subject_id')->unique();
 
-        if ($studentIds->isNotEmpty() && $subjectIds->isNotEmpty()) {
-            $hwSubs = HomeworkSubmission::whereHas('homework', function ($q) use ($schoolId, $subjectIds) {
-                $q->where('school_id', $schoolId)->whereIn('subject_id', $subjectIds);
+        // Query homework graded submissions independently (not tied to existing grade rows)
+        $hwQuery = HomeworkSubmission::where('status', 'graded')
+            ->whereHas('homework', function ($q) use ($schoolId) {
+                $q->where('school_id', $schoolId);
             })
-                ->whereIn('student_id', $studentIds)
-                ->where('status', 'graded')
-                ->with('homework')
-                ->get()
-                ->groupBy(fn($s) => $s->student_id . '-' . $s->homework->subject_id);
+            ->with('homework')
+            ->whereHas('student', function ($q) use ($schoolId) {
+                $q->where('school_id', $schoolId);
+            });
 
-            foreach ($hwSubs as $key => $subs) {
-                $avg = $subs->avg(function ($s) {
-                    return $s->homework->max_score > 0
-                        ? ($s->score / $s->homework->max_score) * 100
-                        : 0;
-                });
-                $homeworkAverages[$key] = round($avg, 1);
-            }
+        // Apply same filters as grades
+        if ($request->filled('class_id')) {
+            $hwQuery->whereHas('homework', fn($q) => $q->where('class_id', $request->class_id));
+        }
+        if ($request->filled('subject_id')) {
+            $hwQuery->whereHas('homework', fn($q) => $q->where('subject_id', $request->subject_id));
         }
 
-        return view('school.grades.index', compact('grades', 'classes', 'subjects', 'terms', 'homeworkAverages'));
+        $hwSubs = $hwQuery->get();
+
+        // Build averages keyed by student_id-subject_id
+        $grouped = $hwSubs->groupBy(fn($s) => $s->student_id . '-' . ($s->homework->subject_id ?? 'none'));
+        foreach ($grouped as $key => $subs) {
+            $avg = $subs->avg(function ($s) {
+                return $s->homework->max_score > 0
+                    ? ($s->score / $s->homework->max_score) * 100
+                    : 0;
+            });
+            $homeworkAverages[$key] = round($avg, 1);
+        }
+
+        // Also build a standalone homework list for display when no grades exist
+        $homeworkSubmissions = $hwSubs->groupBy(function ($s) {
+            return $s->student_id . '-' . ($s->homework->subject_id ?? 'none') . '-' . $s->homework_id;
+        })->map(function ($subs) {
+            $first = $subs->first();
+            return [
+                'student_name' => $first->student?->full_name ?? 'N/A',
+                'homework_title' => $first->homework?->title ?? 'N/A',
+                'subject_name' => $first->homework?->subject?->name ?? 'N/A',
+                'score' => $first->score,
+                'max_score' => $first->homework?->max_score ?? 100,
+                'graded_at' => $first->graded_at,
+            ];
+        })->values();
+
+        return view('school.grades.index', compact('grades', 'classes', 'subjects', 'terms', 'homeworkAverages', 'homeworkSubmissions'));
     }
 
     public function create()
